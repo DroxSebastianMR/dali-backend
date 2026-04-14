@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UpdateType {
+  PATCH   
+  MINOR   
+  MAJOR   
+}
+
+model SystemConfig {
+  id                Int      @id @default(autoincrement())
+  environment       String   @unique
+  backend_name      String
+  backend_version   String
+
+  maintenance_enabled Boolean
+  maintenance_message String?
+  maintenance_end     DateTime?
+
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  appConfigs        AppConfig[]
+}
+
+model AppConfig {
+  id                    Int      @id @default(autoincrement())
+  system_config_id      Int
+  platform              String   
+  current_version       String
+  min_supported_version String
+  update_type           UpdateType
+  update_message        String?
+  store_url             String?
+  active                Boolean  @default(true)
+  systemConfig          SystemConfig @relation(fields: [system_config_id], references: [id])
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+
+  @@unique([system_config_id, platform])
+}
+
