@@ -82,6 +82,7 @@ model User {
   deleted_at       DateTime?
 
   user_roles       UserRole[]
+  refresh_tokens   RefreshToken[]
 }
 
 model UserRole {
@@ -105,4 +106,27 @@ model Role {
   created_at  DateTime @default(now())
 
   user_roles  UserRole[]
+}
+
+model RefreshToken {
+  id            Int      @id @default(autoincrement())
+
+  user_id       Int
+  user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  token_hash    String   @unique
+
+  device_id     String?
+  device_name   String?
+
+  is_revoked    Boolean  @default(false)
+  revoked_at    DateTime?
+
+  expires_at    DateTime
+  last_used_at  DateTime?
+
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  @@index([user_id])
 }
