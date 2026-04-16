@@ -8,42 +8,101 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-enum UpdateType {
-  PATCH   
-  MINOR   
-  MAJOR   
-}
-
 model SystemConfig {
-  id                Int      @id @default(autoincrement())
-  environment       String   @unique
-  backend_name      String
-  backend_version   String
-
+  id                  Int         @id @default(autoincrement())
+  environment         String      @unique
+  backend_name        String
+  backend_version     String
   maintenance_enabled Boolean
   maintenance_message String?
   maintenance_end     DateTime?
-
-  created_at        DateTime @default(now())
-  updated_at        DateTime @updatedAt
-
-  appConfigs        AppConfig[]
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  appConfigs          AppConfig[]
 }
 
 model AppConfig {
-  id                    Int      @id @default(autoincrement())
+  id                    Int          @id @default(autoincrement())
   system_config_id      Int
-  platform              String   
+  platform              String
   current_version       String
   min_supported_version String
   update_type           UpdateType
   update_message        String?
   store_url             String?
-  active                Boolean  @default(true)
+  active                Boolean      @default(true)
+  created_at            DateTime     @default(now())
+  updated_at            DateTime     @updatedAt
   systemConfig          SystemConfig @relation(fields: [system_config_id], references: [id])
-  created_at            DateTime @default(now())
-  updated_at            DateTime @updatedAt
 
   @@unique([system_config_id, platform])
 }
 
+enum UpdateType {
+  PATCH
+  MINOR
+  MAJOR
+}
+
+enum UserProvider {
+  local
+  facebook
+  google
+}
+
+enum UserStatus {
+  active
+  suspended
+  deleted
+}
+
+model User {
+  id               Int      @id @default(autoincrement())
+
+  email            String   @unique
+  password_hash    String?
+
+  provider         UserProvider @default(local)
+  provider_id      String?
+
+  nombre           String
+  apellido         String
+  telefono         String?
+  foto_url         String?
+
+  email_verified   Boolean  @default(false)
+  telefono_verified Boolean @default(false)
+
+  estado           UserStatus @default(active)
+
+  last_login_at    DateTime?
+
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+  deleted_at       DateTime?
+
+  user_roles       UserRole[]
+}
+
+model UserRole {
+  user_id Int
+  role_id Int
+
+  assigned_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [role_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, role_id])
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique
+  name        String?
+  description String?
+
+  created_at  DateTime @default(now())
+
+  user_roles  UserRole[]
+}
