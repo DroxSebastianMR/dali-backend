@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import appConfig from '@/config/app.config';
 import { PrismaModule } from '@/common/prisma/prisma.module';
 import { FEATURE_MODULES_SYSTEM } from '@/modules/system';
+import { FEATURE_MODULES_AUTH } from '@/modules/auth';
 
 @Module({
   imports: [
@@ -12,7 +13,8 @@ import { FEATURE_MODULES_SYSTEM } from '@/modules/system';
       envFilePath: ['.env'],
     }),
     PrismaModule,
-    ...FEATURE_MODULES_SYSTEM
+    ...FEATURE_MODULES_SYSTEM,
+    ...FEATURE_MODULES_AUTH,
   ],
   controllers: [],
   providers: [],
