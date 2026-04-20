@@ -11,9 +11,6 @@ import { PasswordService } from './services/password.service';
 @Module({
   imports: [
     JwtModule.register({
-      // secret: 'SECRET_KEY', // luego usa env
-      // signOptions: { expiresIn: '15m' },
-
       secret: process.env.JWT_ACCESS_SECRET,
     }),
   ],
