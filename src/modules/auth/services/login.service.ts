@@ -20,7 +20,6 @@ export class LoginService {
     async login(data: LoginUserDto) {
         const { email, password } = data;
 
-        // busca usuario
         const user = await this.prisma.user.findUnique({
             where: { email },
         });
@@ -33,7 +32,6 @@ export class LoginService {
             throw new UnauthorizedException('Credenciales inválidas');
         }
 
-        // validar password
         const isValid = await this.passwordService.compare(
             password,
             user.password_hash,
@@ -43,17 +41,14 @@ export class LoginService {
             throw new UnauthorizedException('Credenciales inválidas');
         }
 
-        // payload
         const payload = {
             sub: user.id,
             email: user.email,
         };
 
-        // generar tokens
         const accessToken = this.tokenService.signAccessToken(payload);
         const refreshToken = await this.refreshTokenService.create(user.id);
 
-        // actualizar ultimo login
         await this.prisma.user.update({
             where: { id: user.id },
             data: {

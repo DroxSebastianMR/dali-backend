@@ -27,10 +27,8 @@ export class AuthService {
   async refreshToken(data: RefreshTokenInput) {
     const { refresh_token } = data;
 
-    // validar refresh token
     const stored = await this.refreshTokenService.validate(refresh_token);
 
-    // obtener usuario
     const user = await this.prisma.user.findUnique({
       where: { id: stored.user_id },
     });
@@ -39,7 +37,6 @@ export class AuthService {
       throw new UnauthorizedException('User not valid');
     }
 
-    // nuevo access token
     const payload = {
       sub: user.id,
       email: user.email,
@@ -47,18 +44,15 @@ export class AuthService {
 
     const access_token = this.tokenService.signAccessToken(payload);
 
-    // rotar refresh token 
     const new_refresh_token = 
       await this.refreshTokenService.rotate(refresh_token);
 
-    // respuesta
     return {
       access_token,
       refresh_token: new_refresh_token,
     };
       
   }
-  // logout
   async logout(refreshToken: string){
     await this.refreshTokenService.revoke(refreshToken);
 

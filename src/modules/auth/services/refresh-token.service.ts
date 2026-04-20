@@ -9,12 +9,10 @@ import ms, { StringValue } from 'ms';
 export class RefreshTokenService {
     constructor(private readonly prisma: PrismaService) {}
     
-    // hash deterministico
     private hash(token: string): string {
         return createHash('sha256').update(token).digest('hex');
     }
 
-    // crear refresh token
     async create(userId: number) {
         const token = randomUUID();
         const tokenHash = this.hash(token);
@@ -42,7 +40,6 @@ export class RefreshTokenService {
         return token;
     }
 
-    // validar tokens
     async validate(token: string){
         const tokenHash = this.hash(token);
 
@@ -63,11 +60,9 @@ export class RefreshTokenService {
         return stored;
     }
 
-    // rotar token
     async rotate(token: string){
         const stored = await this.validate(token);
 
-        // revoca actual
         await this.prisma.refreshToken.update({
             where: { id: stored.id },
             data: {
@@ -76,11 +71,9 @@ export class RefreshTokenService {
             },
         });
 
-        // crea nuevo
         return this.create(stored.user_id);
     }
 
-    // revocar token actual (logout)
     async revoke(token: string) {
         const tokenHash = this.hash(token);
 
