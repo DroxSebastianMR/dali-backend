@@ -20,7 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "prisma": {
-    "seed": "ts-node prisma/systemseed.ts"
+    "seed": "ts-node prisma/userseed.ts"
   },
   "dependencies": {
     "@anatine/zod-openapi": "^2.2.8",
