@@ -4,82 +4,66 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '@/common/prisma/prisma.service';
 import { RefreshTokenInput } from '@/modules/auth/schema/refresh-token.schema';
-import { UserStatus, RefreshToken } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
+import { RefreshTokenService } from './refresh-token.service';
+import { TokenService } from './token.service';
+import { LoginService } from './login.service';
+import { LoginUserDto } from '../dtos/login-user.dto';
+import { UserStatus } from '@prisma/client';
+import { email, string } from 'zod/v4';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService,
+    private readonly refreshTokenService: RefreshTokenService,
+    private readonly tokenService: TokenService,
+    private readonly loginService: LoginService,
   ) {}
+
+  async login(data: LoginUserDto){
+    return this.loginService.login(data);
+  }
 
   async refreshToken(data: RefreshTokenInput) {
     const { refresh_token } = data;
-    const storedTokens = await this.prisma.refreshToken.findMany({
-      where: {
-        is_revoked: false,
-        expires_at: {
-          gt: new Date(),
-        },
-      },
-    });
 
-    let validToken: RefreshToken | null = null;
+    // validar refresh token
+    const stored = await this.refreshTokenService.validate(refresh_token);
 
-    for (const token of storedTokens) {
-      const isMatch = await bcrypt.compare(
-        refresh_token,
-        token.token_hash,
-      );
-
-      if (isMatch) {
-        validToken = token;
-        break;
-      }
-    }
-    if (!validToken) {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
+    // obtener usuario
     const user = await this.prisma.user.findUnique({
-      where: { id: validToken.user_id },
+      where: { id: stored.user_id },
     });
 
-    if (!user || user.estado !== UserStatus.active) {
+    if(!user || user.estado !== UserStatus.active){
       throw new UnauthorizedException('User not valid');
     }
-    const newAccessToken = this.jwtService.sign({
+
+    // nuevo access token
+    const payload = {
       sub: user.id,
       email: user.email,
-    });
-    await this.prisma.refreshToken.update({
-      where: { id: validToken.id },
-      data: {
-        is_revoked: true,
-        revoked_at: new Date(),
-      },
-    });
-    const newRefreshToken = this.generateRefreshToken();
-    const hashed = await bcrypt.hash(newRefreshToken, 10);
+    };
 
-    await this.prisma.refreshToken.create({
-      data: {
-        user_id: user.id,
-        token_hash: hashed,
-        expires_at: new Date(
-          Date.now() + 7 * 24 * 60 * 60 * 1000,
-        ),
-      },
-    });
+    const access_token = this.tokenService.signAccessToken(payload);
+
+    // rotar refresh token 
+    const new_refresh_token = 
+      await this.refreshTokenService.rotate(refresh_token);
+
+    // respuesta
+    return {
+      access_token,
+      refresh_token: new_refresh_token,
+    };
+      
+  }
+  // logout
+  async logout(refreshToken: string){
+    await this.refreshTokenService.revoke(refreshToken);
 
     return {
-      access_token: newAccessToken,
-      refresh_token: newRefreshToken,
-    };
-  }
-
-  private generateRefreshToken(): string {
-    return crypto.randomUUID();
+      message: 'Sesión cerrada correctamente',
+    }
   }
 }

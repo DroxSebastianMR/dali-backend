@@ -1,5 +1,5 @@
 import { PrismaService } from "@/common/prisma/prisma.service";
-import { Injectable } from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { createHash, randomUUID } from "crypto";
 import ms, { StringValue } from 'ms';
 
@@ -40,5 +40,59 @@ export class RefreshTokenService {
         });
 
         return token;
+    }
+
+    // validar tokens
+    async validate(token: string){
+        const tokenHash = this.hash(token);
+
+        const stored = await this.prisma.refreshToken.findFirst({
+            where: {
+                token_hash: tokenHash,
+                is_revoked: false,
+                expires_at: {
+                    gt: new Date(),
+                },
+            },
+        });
+
+        if(!stored){
+            throw new UnauthorizedException('Invalid refresh token');
+        }
+
+        return stored;
+    }
+
+    // rotar token
+    async rotate(token: string){
+        const stored = await this.validate(token);
+
+        // revoca actual
+        await this.prisma.refreshToken.update({
+            where: { id: stored.id },
+            data: {
+                is_revoked: true,
+                revoked_at: new Date(),
+            },
+        });
+
+        // crea nuevo
+        return this.create(stored.user_id);
+    }
+
+    // revocar token actual (logout)
+    async revoke(token: string) {
+        const tokenHash = this.hash(token);
+
+        await this.prisma.refreshToken.updateMany({
+            where: {
+                token_hash: tokenHash,
+                is_revoked: false,
+            },
+            data: {
+                is_revoked: true,
+                revoked_at: new Date(),
+            },
+        });
     }
 }
