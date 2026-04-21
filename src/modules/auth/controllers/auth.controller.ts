@@ -12,11 +12,16 @@ import { RefreshTokenSchema } from '@/modules/auth/schema/refresh-token.schema';
 import { ValidationPipe } from '@/common/validation/validation.pipe';
 import { LoginUserSchema } from '../schema/login-user.schema';
 import { LoginUserDto } from '../dtos/login-user.dto';
+import { LogoutSchema } from '../schema/logout.schema';
+import { LogoutDTO } from '../dtos/logout.dto';
+import { LogoutService } from '../services/logout.service';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService,
+              private readonly logoutService: LogoutService,
+  ) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -26,6 +31,17 @@ export class AuthController {
     @Body(new ValidationPipe(LoginUserSchema)) body: LoginUserDto,
   ){
     return this.authService.login(body);
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Cerrar Sesión del usuario' })
+  @ApiResponse({ status: 200, description: 'Logout Exitoso', })
+  @ApiResponse({ status: 401, description: 'Token Inválido' })
+  async logout(
+    @Body(new ValidationPipe(LogoutSchema)) body: LogoutDTO,
+  ) {
+    return this.logoutService.logout(body.refresh_token);
   }
 
   @Post('refresh-token')
