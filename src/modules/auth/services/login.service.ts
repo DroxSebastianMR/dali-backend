@@ -5,6 +5,8 @@ import { TokenService } from "@/modules/auth/services/token.service";
 import { RefreshTokenService } from "@/modules/auth/services/refresh-token.service";
 import { LoginUserDto } from "@/modules/auth/dtos/login-user.dto";
 import { User, UserStatus } from "@prisma/client";
+import { mapAuthResponse } from "../mappers/auth-response.mapper";
+import { UserWithRoles } from "../types/user.types";
 
 type JwtPayload = {
   sub: number;
@@ -24,13 +26,20 @@ export class LoginService {
     const user = await this.validateUser(email, password);
     const tokens = await this.generateTokens(user);
     await this.updateLastLogin(user.id);
-    return this.buildResponse(user, tokens);
+
+    return mapAuthResponse(user, tokens.accessToken, tokens.refreshToken);
   }
 
-
-  private async validateUser(email: string, password: string): Promise<User> {
+  private async validateUser(email: string, password: string): Promise<UserWithRoles> {
     const user = await this.prisma.user.findUnique({
       where: { email },
+      include: {
+        user_roles: {
+          include: {
+            role: true,
+          },
+        },
+      },
     });
 
     if (
@@ -72,23 +81,5 @@ export class LoginService {
         last_login_at: new Date(),
       },
     });
-  }
-
-  private buildResponse(user: User, tokens: { accessToken: string; refreshToken: string }) {
-    return {
-      access_token: tokens.accessToken,
-      refresh_token: tokens.refreshToken,
-      user: {
-        id: user.id,
-        email: user.email,
-        nombre: user.nombre,
-        apellido: user.apellido,
-        telefono: user.telefono,
-        foto_url: user.foto_url,
-        estado: user.estado,
-        email_verified: user.email_verified,
-        telefono_verified: user.telefono_verified,
-      },
-    };
   }
 }
