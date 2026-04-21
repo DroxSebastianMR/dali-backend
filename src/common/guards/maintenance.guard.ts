@@ -5,11 +5,20 @@ import {
   ServiceUnavailableException,
 } from "@nestjs/common";
 import { PrismaService } from "@/common/prisma/prisma.service";
+import { ErrorFactory } from "@/common/errors/error.factory";
+import { ErrorCode } from "@/common/errors/error-codes";
+
+type MaintenanceState = {
+  enabled: boolean;
+  message: string | null;
+  estimatedEnd: string | null;
+};
 
 @Injectable()
 export class MaintenanceGuard implements CanActivate {
-  private cachedMaintenance: boolean | null = null;
+  private cache: MaintenanceState | null = null;
   private lastCheck = 0;
+
   private readonly CACHE_TTL = 5000;
 
   constructor(private readonly prisma: PrismaService) {}
@@ -19,26 +28,34 @@ export class MaintenanceGuard implements CanActivate {
 
     if (this.isStatusRoute(request)) return true;
 
-    const isMaintenance = await this.isMaintenanceEnabled();
+    const maintenance = await this.getMaintenanceState();
 
-    if (!isMaintenance) return true;
+    if (!maintenance.enabled) return true;
 
-    throw new ServiceUnavailableException({
-      message: "Sistema en mantenimiento",
-      maintenance: true,
-    });
-  }
-  private isStatusRoute(request: any): boolean {
-    return (
-      request.method === "GET" &&
-      request.url === "/system/status"
+    throw new ServiceUnavailableException(
+      ErrorFactory.create({
+        statusCode: 503,
+        error: "SERVICE_UNAVAILABLE",
+        code: ErrorCode.SYSTEM_MAINTENANCE,
+        message: maintenance.message ?? "Sistema en mantenimiento",
+        path: request.url,
+        meta: {
+          maintenance: true,
+          estimatedEnd: maintenance.estimatedEnd,
+        },
+      }),
     );
   }
-  private async isMaintenanceEnabled(): Promise<boolean> {
+
+  private isStatusRoute(request: any): boolean {
+    return request.method === "GET" && request.url === "/system/status";
+  }
+
+  private async getMaintenanceState(): Promise<MaintenanceState> {
     const now = Date.now();
 
-    if (this.cachedMaintenance !== null && now - this.lastCheck < this.CACHE_TTL) {
-      return this.cachedMaintenance;
+    if (this.cache && now - this.lastCheck < this.CACHE_TTL) {
+      return this.cache;
     }
 
     const environment = process.env.NODE_ENV ?? "development";
@@ -48,12 +65,18 @@ export class MaintenanceGuard implements CanActivate {
       select: {
         maintenance_enabled: true,
         maintenance_message: true,
+        maintenance_end: true,
       },
     });
 
-    this.cachedMaintenance = config?.maintenance_enabled ?? false;
+    this.cache = {
+      enabled: config?.maintenance_enabled ?? false,
+      message: config?.maintenance_message ?? null,
+      estimatedEnd: config?.maintenance_end?.toISOString() ?? null,
+    };
+
     this.lastCheck = now;
 
-    return this.cachedMaintenance;
+    return this.cache;
   }
 }
