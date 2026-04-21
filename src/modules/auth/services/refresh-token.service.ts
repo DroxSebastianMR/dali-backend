@@ -77,7 +77,7 @@ export class RefreshTokenService {
     async revoke(token: string) {
         const tokenHash = this.hash(token);
 
-        await this.prisma.refreshToken.updateMany({
+        const result = await this.prisma.refreshToken.updateMany({
             where: {
                 token_hash: tokenHash,
                 is_revoked: false,
@@ -87,5 +87,9 @@ export class RefreshTokenService {
                 revoked_at: new Date(),
             },
         });
+
+        if(result.count === 0){
+            throw new UnauthorizedException('Token Inválido');
+        }
     }
 }

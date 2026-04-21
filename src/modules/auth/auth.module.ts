@@ -7,6 +7,7 @@ import { RefreshTokenService } from './services/refresh-token.service';
 import { LoginService } from './services/login.service';
 import { TokenService } from './services/token.service';
 import { PasswordService } from './services/password.service';
+import { LogoutService } from './services/logout.service';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { PasswordService } from './services/password.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, RefreshTokenService, LoginService, TokenService, PasswordService],
+  providers: [AuthService, PrismaService, RefreshTokenService, LoginService, TokenService, PasswordService, LogoutService],
 })
 export class AuthModule {}
