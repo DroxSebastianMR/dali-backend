@@ -15,9 +15,13 @@ export class ResetPasswordService {
             .update(token)
             .digest('hex');
 
-        const resetToken = await this.prisma.resetPasswordToken.findUnique({
+        const resetToken = await this.prisma.resetPasswordToken.findFirst({
             where: {
                 token_hash: tokenHash,
+                used_at: null,
+                expires_at: {
+                    gt: new Date(),
+                },
             },
         });
 
@@ -35,7 +39,16 @@ export class ResetPasswordService {
             this.prisma.resetPasswordToken.update({
                 where: { id: resetToken.id },
                 data: { used_at: new Date(), }
-            })
+            }),
+            this.prisma.resetPasswordToken.updateMany({
+                where: {
+                    user_id: resetToken.user_id,
+                    used_at: null,
+                },
+                data: {
+                    used_at: new Date(),
+                },
+            }),
         ]);
 
         return {
