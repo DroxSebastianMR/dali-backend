@@ -20,11 +20,21 @@ export class RecoverdPasswordService {
             }
         }
 
-        const token = randomBytes(32).toString('hex');
+        await this.prisma.resetPasswordToken.updateMany({
+            where: {
+                user_id: user.id,
+                used_at: null,
+            },
+            data: {
+                used_at: new Date(),
+            },
+        });
+
+        const token = Math.random().toString(36).substring(2, 8).toUpperCase();
         const tokenHash = createHash('sha256').update(token).digest('hex');
 
         const expires = new Date();
-        expires.setHours(expires.getHours() + 1);
+        expires.setMinutes(expires.getMinutes() + 15);
 
         await this.prisma.resetPasswordToken.create({
             data: {

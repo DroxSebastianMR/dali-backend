@@ -12,7 +12,8 @@ export class LogoutService {
         await this.refreshTokenService.revoke(refreshToken);
         
         return{
-            message: 'OK. Logout Exitoso',
+            status: 'OK',
+            message: 'Logout Exitoso',
         };
     }
 }
