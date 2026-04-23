@@ -9,6 +9,7 @@ import { RefreshTokenService } from './services/refresh-token.service';
 import { LoginService } from './services/login.service';
 import { TokenService } from './services/token.service';
 import { PasswordService } from './services/password.service';
+import { LogoutService } from './services/logout.service';
 
 @Module({
   imports: [

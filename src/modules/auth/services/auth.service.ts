@@ -9,7 +9,6 @@ import { TokenService } from './token.service';
 import { LoginService } from './login.service';
 import { LoginUserDto } from '../dtos/login-user.dto';
 import { UserStatus } from '@prisma/client';
-import { email, string } from 'zod/v4';
 
 @Injectable()
 export class AuthService {
@@ -52,12 +51,5 @@ export class AuthService {
       refresh_token: new_refresh_token,
     };
       
-  }
-  async logout(refreshToken: string){
-    await this.refreshTokenService.revoke(refreshToken);
-
-    return {
-      message: 'Sesión cerrada correctamente',
-    }
   }
 }
