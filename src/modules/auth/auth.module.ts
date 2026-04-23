@@ -3,6 +3,8 @@ import { AuthController } from './controllers/auth.controller';
 import { AuthService } from './services/auth.service';
 import { PrismaService } from '@/common/prisma/prisma.service';
 import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from './strategies/jwt.strategy';
 import { RefreshTokenService } from './services/refresh-token.service';
 import { LoginService } from './services/login.service';
 import { TokenService } from './services/token.service';
@@ -15,6 +17,7 @@ import { ResetPasswordService } from './services/reset-password.service';
 
 @Module({
   imports: [
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: process.env.JWT_ACCESS_SECRET,
     }),
@@ -23,5 +26,16 @@ import { ResetPasswordService } from './services/reset-password.service';
   providers: [AuthService, PrismaService, RefreshTokenService, TokenService, 
     LoginService, PasswordService, LogoutService,
     RecoverdPasswordService, ResetPasswordService],
+  controllers: [AuthController],
+  providers: [
+    AuthService,
+    PrismaService,
+    RefreshTokenService,
+    LogoutService,
+    LoginService,
+    TokenService,
+    PasswordService,
+    JwtStrategy],
+  exports: [PassportModule, JwtStrategy]
 })
-export class AuthModule {}
+export class AuthModule { }
