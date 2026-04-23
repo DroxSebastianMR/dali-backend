@@ -23,10 +23,6 @@ import { ResetPasswordService } from './services/reset-password.service';
     }),
   ],
   controllers: [AuthController, RecoverPasswordController, ResetPasswordController],
-  providers: [AuthService, PrismaService, RefreshTokenService, TokenService, 
-    LoginService, PasswordService, LogoutService,
-    RecoverdPasswordService, ResetPasswordService],
-  controllers: [AuthController],
   providers: [
     AuthService,
     PrismaService,
@@ -35,6 +31,8 @@ import { ResetPasswordService } from './services/reset-password.service';
     LoginService,
     TokenService,
     PasswordService,
+    RecoverdPasswordService,
+    ResetPasswordService,
     JwtStrategy],
   exports: [PassportModule, JwtStrategy]
 })
