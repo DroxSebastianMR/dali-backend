@@ -19,7 +19,7 @@ import { SystemStatusSchema } from "@/modules/system/schema/system-status.schema
 export class SystemStatusController {
   constructor(
     private readonly systemStatusService: SystemStatusService,
-  ) {}
+  ) { }
 
   @Get("status")
   @ApiOperation({
