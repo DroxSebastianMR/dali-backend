@@ -23,6 +23,7 @@ import { LogoutService } from './services/logout.service';
     AuthService,
     PrismaService,
     RefreshTokenService,
+    LogoutService,
     LoginService,
     TokenService,
     PasswordService,
