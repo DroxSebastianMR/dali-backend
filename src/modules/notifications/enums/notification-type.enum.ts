@@ -1,0 +1,8 @@
+export enum NotificationType {
+    SYSTEM_INFO = 'SYSTEM_INFO',
+    PRICE_ALERT = 'PRICE_ALERT',
+    STOCK_CONFIRM = 'STOCK_CONFIRM',
+    ORDER_UPDATE = 'ORDER_UPDATE',
+    PROMO = 'PROMO',
+    NEARBY_SHOP = 'NEARBY_SHOP'
+}

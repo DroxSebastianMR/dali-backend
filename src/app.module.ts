@@ -4,6 +4,7 @@ import appConfig from '@/config/app.config';
 import { PrismaModule } from '@/common/prisma/prisma.module';
 import { FEATURE_MODULES_SYSTEM } from '@/modules/system';
 import { FEATURE_MODULES_AUTH } from '@/modules/auth';
+import { FEATURE_MODULES_NOTIFICATIONS } from '@/modules/notifications';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { FEATURE_MODULES_AUTH } from '@/modules/auth';
     PrismaModule,
     ...FEATURE_MODULES_SYSTEM,
     ...FEATURE_MODULES_AUTH,
+    ...FEATURE_MODULES_NOTIFICATIONS,
   ],
   controllers: [],
   providers: [],
