@@ -5,6 +5,7 @@ import { PrismaModule } from '@/common/prisma/prisma.module';
 import { FEATURE_MODULES_SYSTEM } from '@/modules/system';
 import { FEATURE_MODULES_AUTH } from '@/modules/auth';
 import { FEATURE_MODULES_NOTIFICATIONS } from '@/modules/notifications';
+import { FEATURE_MODULES_USERS } from '@/modules/users';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { FEATURE_MODULES_NOTIFICATIONS } from '@/modules/notifications';
     }),
     PrismaModule,
     ...FEATURE_MODULES_SYSTEM,
+    ...FEATURE_MODULES_USERS,
     ...FEATURE_MODULES_AUTH,
     ...FEATURE_MODULES_NOTIFICATIONS,
   ],
