@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { BannerRepository } from '@/modules/home/infrastructure/home.repository';
-import { BannerScorer } from '@/modules/home/controllers/domain/banner/banner.scorer';
-import { BannerMapper } from '@/modules/home/controllers/domain/banner/banner.mapper';
+import { BannerScorer } from '@/modules/home/domain/banner/banner.scorer';
+import { BannerMapper } from '@/modules/home/domain/banner/banner.mapper';
 import { HomeBannersInput } from '@/modules/home/schema/home-banners.schema';
 import { HomeBannersResponseDTO } from '@/modules/home/dtos/home-banners.dto';
 
