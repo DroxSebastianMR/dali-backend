@@ -6,12 +6,12 @@ import { RecoverPasswordSchema } from '../schema/recover-password.schema';
 import { RecoverPasswordDTO } from '../dtos/recover-password.dto';
 
 
-@ApiTags( 'Users - Autenticación' )
-@Controller( 'users/auth' )
+@ApiTags( 'Auth' )
+@Controller( 'auth' )
 export class RecoverPasswordController {
     constructor(private readonly authService: RecoverdPasswordService) {}
 
-    @Post( 'forgor_password' )
+    @Post( 'recover-password' )
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Solicitud de recuperación de contrasñea ' })
     @ApiResponse({ status: 200, description: 'Si el correo existe, se enviará un email' })

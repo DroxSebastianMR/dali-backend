@@ -6,8 +6,8 @@ import { ResetPasswordDTO } from "../dtos/reset-password.dto";
 import { ValidationPipe } from "@/common/validation/validation.pipe";
 
 
-@ApiTags('Users - Autenticación')
-@Controller('users/auth')
+@ApiTags( 'Auth' )
+@Controller( 'auth' )
 export class ResetPasswordController {
     constructor(private readonly resetPasswordService: ResetPasswordService) {}
 
