@@ -1,5 +1,5 @@
 import { registerAs } from '@nestjs/config';
-import { AppConfig } from './config.types';
+import { AppConfig } from '@/config/config.types';
 
 export default registerAs('app', (): AppConfig => ({
   name: 'DALI API',

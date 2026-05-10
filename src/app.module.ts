@@ -6,6 +6,7 @@ import { FEATURE_MODULES_SYSTEM } from '@/modules/system';
 import { FEATURE_MODULES_AUTH } from '@/modules/auth';
 import { FEATURE_MODULES_NOTIFICATIONS } from '@/modules/notifications';
 import { FEATURE_MODULES_USERS } from '@/modules/users';
+import { FEATURE_MODULES_HOME } from '@/modules/home';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { FEATURE_MODULES_USERS } from '@/modules/users';
     ...FEATURE_MODULES_USERS,
     ...FEATURE_MODULES_AUTH,
     ...FEATURE_MODULES_NOTIFICATIONS,
+    ...FEATURE_MODULES_HOME
   ],
   controllers: [],
   providers: [],
