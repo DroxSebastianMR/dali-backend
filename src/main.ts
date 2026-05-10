@@ -1,25 +1,46 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from '@/app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
+import {
+  DocumentBuilder,
+  SwaggerModule,
+} from '@nestjs/swagger';
+
 import { ConfigService } from '@nestjs/config';
+
+import { AppModule } from '@/app.module';
+
 import { AppConfig } from '@/config/config.types';
-import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
-import { MaintenanceGuard } from '@/common/guards/maintenance.guard';
+
 import { PrismaService } from '@/common/prisma/prisma.service';
+
+import { MaintenanceGuard } from '@/common/guards/maintenance.guard';
+
+import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const configService = app.get(ConfigService);
-  const prisma = app.get(PrismaService);
+  const configService =
+    app.get(ConfigService);
 
-  app.useGlobalFilters(new GlobalExceptionFilter());
-  app.useGlobalGuards(new MaintenanceGuard(prisma));
+  const prisma =
+    app.get(PrismaService);
 
-  const appConfig = configService.get<AppConfig>('app');
+  app.useGlobalFilters(
+    new GlobalExceptionFilter(),
+  );
+
+  app.useGlobalGuards(
+    new MaintenanceGuard(prisma),
+  );
+
+  const appConfig =
+    configService.get<AppConfig>('app');
 
   if (!appConfig) {
-    throw new Error('No se pudo cargar la configuración de la app');
+    throw new Error(
+      'Application configuration not found',
+    );
   }
 
   app.enableCors({
@@ -27,20 +48,54 @@ async function bootstrap() {
     credentials: true,
   });
 
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle(appConfig.name)
-    .setDescription(appConfig.description)
-    .setVersion(appConfig.version)
-    .addBearerAuth()
-    .build();
+  setupSwagger(app, appConfig);
 
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api/docs', app, document);
+  const port =
+    Number(process.env.PORT) ||
+    appConfig.port ||
+    3000;
 
-  await app.listen(appConfig.port);
+  await app.listen(port, '0.0.0.0');
 
-  console.log(`🚀 Servidor corriendo en http://localhost:${appConfig.port}`);
-  console.log(`📘 Documentación Swagger: http://localhost:${appConfig.port}/api/docs`);
+  logServerInfo(port);
+}
+
+function setupSwagger(
+  app: any,
+  config: AppConfig,
+) {
+  const swaggerConfig =
+    new DocumentBuilder()
+      .setTitle(config.name)
+      .setDescription(config.description)
+      .setVersion(config.version)
+      .addBearerAuth()
+      .build();
+
+  const document =
+    SwaggerModule.createDocument(
+      app,
+      swaggerConfig,
+    );
+
+  SwaggerModule.setup(
+    'api/docs',
+    app,
+    document,
+  );
+}
+
+function logServerInfo(port: number) {
+  console.log('');
+  console.log(
+    `🚀 Server running on port ${port}`,
+  );
+
+  console.log(
+    `📘 Swagger available at /api/docs`,
+  );
+
+  console.log('');
 }
 
 bootstrap();
