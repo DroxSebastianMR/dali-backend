@@ -8,6 +8,41 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum BannerType {
+  PROMOTION
+  BUSINESS
+  EVENT
+  NEARBY
+  RECOMMENDATION
+}
+
+enum BannerTargetType {
+  BUSINESS
+  CATEGORY
+  PRODUCT
+  PROMOTION
+  SEARCH
+  EXTERNAL_LINK
+}
+
+enum UpdateType {
+  PATCH
+  MINOR
+  MAJOR
+}
+
+enum UserProvider {
+  local
+  facebook
+  google
+}
+
+enum UserStatus {
+  active
+  suspended
+  deleted
+}
+
 model SystemConfig {
   id                  Int         @id @default(autoincrement())
   environment         String      @unique
@@ -38,24 +73,6 @@ model AppConfig {
   @@unique([system_config_id, platform])
 }
 
-enum UpdateType {
-  PATCH
-  MINOR
-  MAJOR
-}
-
-enum UserProvider {
-  local
-  facebook
-  google
-}
-
-enum UserStatus {
-  active
-  suspended
-  deleted
-}
-
 model User {
   id Int @id @default(autoincrement())
 
@@ -81,12 +98,14 @@ model User {
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
 
-  user_roles         UserRole[]
-  refresh_tokens     RefreshToken[]
-  user_devices       UserDevice[]
-  notifications      Notification[]
-  notification_prefs NotificationPreference[]
+  user_roles            UserRole[]
+  refresh_tokens        RefreshToken[]
+  user_devices          UserDevice[]
+  notifications         Notification[]
+  notification_prefs    NotificationPreference[]
   reset_password_tokens ResetPasswordToken[]
+
+  home_banners HomeBanner[]
 }
 
 model UserRole {
@@ -140,9 +159,9 @@ model UserDevice {
   user_id Int
   user    User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-  device_id    String 
-  device_token String  @unique 
-  platform     String 
+  device_id    String
+  device_token String  @unique
+  platform     String
   model        String?
 
   last_used_at DateTime @default(now())
@@ -155,10 +174,10 @@ model Notification {
   user_id Int
   user    User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-  business_id Int? 
+  business_id Int?
   title       String
   body        String
-  type        String 
+  type        String
   is_read     Boolean @default(false)
   metadata    Json?
 
@@ -172,15 +191,15 @@ model NotificationPreference {
   user_id Int
   user    User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-  channel           String 
-  notification_type String 
+  channel           String
+  notification_type String
   enabled           Boolean @default(true)
 
   @@unique([user_id, channel, notification_type])
 }
 
 model ResetPasswordToken {
-  id         Int       @id @default(autoincrement())
+  id      Int @id @default(autoincrement())
   user_id Int
 
   token_hash String    @unique @db.VarChar(64)
@@ -189,8 +208,152 @@ model ResetPasswordToken {
   request_ip String?   @db.VarChar(45)
   user_agent String?
   created_at DateTime  @default(now())
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id])
   @@index([expires_at])
+}
+
+model HomeBanner {
+  id Int @id @default(autoincrement())
+
+  title    String
+  subtitle String?
+
+  image_url        String
+  background_color String?
+
+  badge_text  String?
+  badge_color String?
+
+  type BannerType
+
+  cta_text String?
+
+  priority Int @default(0)
+
+  starts_at  DateTime?
+  expires_at DateTime?
+
+  is_active Boolean @default(true)
+
+  created_by Int?
+  creator    User? @relation(fields: [created_by], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  targets   BannerTarget[]
+  locations BannerLocation[]
+
+  @@index([type])
+  @@index([priority])
+  @@index([is_active])
+}
+
+model BannerTarget {
+  id Int @id @default(autoincrement())
+
+  banner_id Int
+  banner    HomeBanner @relation(fields: [banner_id], references: [id], onDelete: Cascade)
+
+  target_type BannerTargetType
+
+  business_id Int?
+  business    Business? @relation(fields: [business_id], references: [id])
+
+  category_id Int?
+  category    ProductCategory? @relation(fields: [category_id], references: [id])
+
+  product_id Int?
+  product    Product? @relation(fields: [product_id], references: [id])
+
+  search_query String?
+
+  external_url String?
+
+  created_at DateTime @default(now())
+
+  @@index([banner_id])
+}
+
+model BannerLocation {
+  id Int @id @default(autoincrement())
+
+  banner_id Int
+  banner    HomeBanner @relation(fields: [banner_id], references: [id], onDelete: Cascade)
+
+  country  String?
+  state    String?
+  city     String?
+  district String?
+
+  latitude  Decimal? @db.Decimal(9, 6)
+  longitude Decimal? @db.Decimal(9, 6)
+
+  radius_km Int?
+
+  created_at DateTime @default(now())
+
+  @@index([city])
+  @@index([district])
+}
+
+model Business {
+  id Int @id @default(autoincrement())
+
+  owner_user_id Int?
+
+  nombre_comercial String
+  razon_social     String?
+  ruc              String?
+  descripcion      String?
+  logo_url         String?
+
+  estado String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  banner_targets BannerTarget[]
+}
+
+model ProductCategory {
+  id Int @id @default(autoincrement())
+
+  nombre      String
+  descripcion String?
+
+  parent_id Int?
+
+  parent ProductCategory? @relation("CategoryParent", fields: [parent_id], references: [id])
+
+  children ProductCategory[] @relation("CategoryParent")
+
+  created_at DateTime @default(now())
+
+  banner_targets BannerTarget[]
+
+  products Product[]
+}
+
+model Product {
+  id Int @id @default(autoincrement())
+
+  nombre      String
+  descripcion String?
+
+  barcode String? @unique
+
+  marca         String?
+  unidad_medida String?
+
+  category_id Int?
+
+  category ProductCategory? @relation(fields: [category_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  banner_targets BannerTarget[]
 }
