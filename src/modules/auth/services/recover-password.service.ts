@@ -49,7 +49,7 @@ export class RecoverdPasswordService {
 
         if (isDev) {
             console.log('[RESET TOKEN]', token);
-        }
+        }   
         return {
             status: 'OK',
             message: 'Si el correo existe, se enviará un enlace de recuperación'

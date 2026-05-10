@@ -1,5 +1,3 @@
-// src/modules/home/controllers/home.controller.ts
-
 import {
   Controller,
   Post,
