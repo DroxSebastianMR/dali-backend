@@ -18,28 +18,28 @@ import { MaintenanceGuard } from '@/common/guards/maintenance.guard';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app =
+    await NestFactory.create(
+      AppModule,
+    );
 
   const configService =
     app.get(ConfigService);
 
   const prisma =
     app.get(PrismaService);
-
   app.useGlobalFilters(
     new GlobalExceptionFilter(),
   );
-
   app.useGlobalGuards(
     new MaintenanceGuard(prisma),
   );
-
   const appConfig =
     configService.get<AppConfig>('app');
 
   if (!appConfig) {
     throw new Error(
-      'Application configuration not found',
+      'No se pudo cargar la configuración de la aplicación',
     );
   }
 
@@ -47,16 +47,20 @@ async function bootstrap() {
     origin: appConfig.frontendUrl,
     credentials: true,
   });
-
-  setupSwagger(app, appConfig);
+  setupSwagger(
+    app,
+    appConfig,
+  );
 
   const port =
     Number(process.env.PORT) ||
     appConfig.port ||
     3000;
 
-  await app.listen(port, '0.0.0.0');
-
+  await app.listen(
+    port,
+    '0.0.0.0',
+  );
   logServerInfo(port);
 }
 
@@ -67,7 +71,9 @@ function setupSwagger(
   const swaggerConfig =
     new DocumentBuilder()
       .setTitle(config.name)
-      .setDescription(config.description)
+      .setDescription(
+        config.description,
+      )
       .setVersion(config.version)
       .addBearerAuth()
       .build();
@@ -85,15 +91,32 @@ function setupSwagger(
   );
 }
 
-function logServerInfo(port: number) {
+function logServerInfo(
+  port: number,
+) {
   console.log('');
+
   console.log(
-    `🚀 Server running on port ${port}`,
+    `🚀 Servidor corriendo en puerto ${port}`,
   );
 
   console.log(
-    `📘 Swagger available at /api/docs`,
+    `🌐 API Local: http://localhost:${port}`,
   );
+
+  console.log(
+    `📘 Swagger Local: http://localhost:${port}/api/docs`,
+  );
+
+  if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+    console.log(
+      `☁️ API Producción: https://${process.env.RAILWAY_PUBLIC_DOMAIN}`,
+    );
+
+    console.log(
+      `📘 Swagger Producción: https://${process.env.RAILWAY_PUBLIC_DOMAIN}/api/docs`,
+    );
+  }
 
   console.log('');
 }
