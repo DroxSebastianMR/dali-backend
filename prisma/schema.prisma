@@ -56,6 +56,17 @@ enum BusinessStatus {
   DELETED
 }
 
+enum PaymentMethodType {
+  CASH
+  YAPE
+  PLIN
+  CARD
+  VISA
+  MASTERCARD
+  BANK_TRANSFER
+  DIGITAL_WALLET
+}
+
 enum InventoryMovementType {
   IN
   OUT
@@ -79,6 +90,20 @@ enum BusinessDocumentStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum SaleStatus {
+  PENDING
+  PAID
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
 }
 
 model SystemConfig {
@@ -143,6 +168,7 @@ model User {
   notifications         Notification[]
   notification_prefs    NotificationPreference[]
   reset_password_tokens ResetPasswordToken[]
+  sales                 Sale[]
 
   home_banners HomeBanner[]
 
@@ -384,6 +410,8 @@ model Business {
 
   locations          BusinessLocation[]
   business_documents BusinessDocument[]
+  sales              Sale[]
+  payment_methods    BusinessPaymentMethod[]
 
   @@index([status])
   @@index([trade_name])
@@ -427,9 +455,38 @@ model BusinessLocation {
 
   inventories Inventory[]
 
+  sales Sale[]
+
   @@index([business_id])
   @@index([city])
   @@index([district])
+}
+
+model BusinessPaymentMethod {
+  id Int @id @default(autoincrement())
+
+  business_id Int
+
+  type PaymentMethodType
+
+  name String?
+
+  account_name String?
+
+  account_number String?
+
+  qr_image_url String?
+
+  is_active Boolean @default(true)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  business Business @relation(fields: [business_id], references: [id], onDelete: Cascade)
+
+  sales Sale[]
+
+  @@index([business_id])
 }
 
 model BusinessHour {
@@ -606,6 +663,7 @@ model Product {
   images      ProductImage[]
   inventories Inventory[]
   prices      ProductPrice[]
+  sale_items  SaleItem[]
 
   banner_targets BannerTarget[]
 
@@ -702,4 +760,71 @@ model InventoryMovement {
   inventory Inventory @relation(fields: [inventory_id], references: [id], onDelete: Cascade)
 
   @@index([inventory_id])
+}
+
+model Sale {
+  id Int @id @default(autoincrement())
+
+  business_id Int
+
+  business_location_id Int?
+
+  user_id Int?
+
+  payment_method_id Int?
+
+  status SaleStatus @default(PAID)
+
+  payment_status PaymentStatus @default(PAID)
+
+  subtotal Decimal @db.Decimal(10, 2)
+
+  discount Decimal @default(0) @db.Decimal(10, 2)
+
+  tax Decimal @default(0) @db.Decimal(10, 2)
+
+  total Decimal @db.Decimal(10, 2)
+
+  notes String?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  business Business @relation(fields: [business_id], references: [id])
+
+  location BusinessLocation? @relation(fields: [business_location_id], references: [id])
+
+  user User? @relation(fields: [user_id], references: [id])
+
+  payment_method BusinessPaymentMethod? @relation(fields: [payment_method_id], references: [id])
+
+  items SaleItem[]
+
+  @@index([business_id])
+  @@index([business_location_id])
+  @@index([user_id])
+  @@index([created_at])
+}
+
+model SaleItem {
+  id Int @id @default(autoincrement())
+
+  sale_id Int
+
+  product_id Int
+
+  quantity Int
+
+  unit_price Decimal @db.Decimal(10, 2)
+
+  total_price Decimal @db.Decimal(10, 2)
+
+  created_at DateTime @default(now())
+
+  sale Sale @relation(fields: [sale_id], references: [id], onDelete: Cascade)
+
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@index([sale_id])
+  @@index([product_id])
 }
