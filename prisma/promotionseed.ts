@@ -14,9 +14,9 @@ async function main() {
   const admin = await prisma.user.create({
     data: {
       email: "sebas@dali.com",
-      nombre: "Sebastian",
-      apellido: "Mercado",
-      estado: "active",
+      first_name: "Sebastian",
+      last_name: "Mercado",
+      status: "ACTIVE",
     },
   });
 
@@ -28,19 +28,19 @@ async function main() {
 
   const bebidas = await prisma.productCategory.create({
     data: {
-      nombre: "Bebidas",
+      name: "Bebidas",
     },
   });
 
   const farmacia = await prisma.productCategory.create({
     data: {
-      nombre: "Farmacia",
+      name: "Farmacia",
     },
   });
 
   const libreria = await prisma.productCategory.create({
     data: {
-      nombre: "Librería",
+      name: "Librería",
     },
   });
 
@@ -52,27 +52,27 @@ async function main() {
 
   const cocaCola = await prisma.product.create({
     data: {
-      nombre: "Coca Cola 1L",
-      marca: "Coca Cola",
-      unidad_medida: "unidad",
+      name: "Coca Cola 1L",
+      brand: "Coca Cola",
+      unit_of_measurement: "unidad",
       category_id: bebidas.id,
     },
   });
 
   const ibuprofeno = await prisma.product.create({
     data: {
-      nombre: "Ibuprofeno 400mg",
-      marca: "Bayer",
-      unidad_medida: "caja",
+      name: "Ibuprofeno 400mg",
+      brand: "Bayer",
+      unit_of_measurement: "caja",
       category_id: farmacia.id,
     },
   });
 
   const cuaderno = await prisma.product.create({
     data: {
-      nombre: "Cuaderno Alpha",
-      marca: "Alpha",
-      unidad_medida: "unidad",
+      name: "Cuaderno Alpha",
+      brand: "Alpha",
+      unit_of_measurement: "unidad",
       category_id: libreria.id,
     },
   });
@@ -85,9 +85,9 @@ async function main() {
 
   const bodega = await prisma.business.create({
     data: {
-      nombre_comercial: "Bodega San José",
-      descripcion: "Bodega local con delivery rápido",
-      estado: "ACTIVE",
+      trade_name: "Bodega San José",
+      description: "Bodega local con delivery rápido",
+      status: "ACTIVE",
       logo_url:
         "https://images.unsplash.com/photo-1542838132-92c53300491e",
     },
@@ -95,9 +95,9 @@ async function main() {
 
   const farmaciaUniversal = await prisma.business.create({
     data: {
-      nombre_comercial: "Farmacia Universal",
-      descripcion: "Medicinas y delivery express",
-      estado: "ACTIVE",
+      trade_name: "Farmacia Universal",
+      description: "Medicinas y delivery express",
+      status: "ACTIVE",
       logo_url:
         "https://images.unsplash.com/photo-1587854692152-cbe660dbde88",
     },
@@ -105,9 +105,9 @@ async function main() {
 
   const libreriaTruman = await prisma.business.create({
     data: {
-      nombre_comercial: "Librería Truman",
-      descripcion: "Útiles escolares y oficina",
-      estado: "ACTIVE",
+      trade_name: "Librería Truman",
+      description: "Útiles escolares y oficina",
+      status: "ACTIVE",
       logo_url:
         "https://images.unsplash.com/photo-1521587760476-6c12a4b040da",
     },

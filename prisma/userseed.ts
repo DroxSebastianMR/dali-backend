@@ -26,10 +26,10 @@ async function main() {
     create: {
       email: 'admin2@test.com',
       password_hash: password2,
-      nombre: 'Admin2',
-      apellido: 'Test',
-      provider: 'local',
-      estado: 'active',
+      first_name: 'Admin2',
+      last_name: 'Test',
+      provider: UserProvider.LOCAL,
+      status: UserStatus.ACTIVE,
       email_verified: true,
 
       user_roles: {

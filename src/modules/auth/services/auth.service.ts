@@ -32,7 +32,7 @@ export class AuthService {
       where: { id: stored.user_id },
     });
 
-    if(!user || user.estado !== UserStatus.active){
+    if(!user || user.status !== UserStatus.ACTIVE){
       throw new UnauthorizedException('User not valid');
     }
 

@@ -41,7 +41,7 @@ export class UsersService {
             );
         }
 
-        if (user.estado !== UserStatus.active) {
+        if (user.status !== UserStatus.ACTIVE) {
             throw new UnauthorizedException(
                 'Usuario no válido',
             );

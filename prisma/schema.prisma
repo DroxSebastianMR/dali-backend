@@ -16,6 +16,13 @@ enum BannerType {
   RECOMMENDATION
 }
 
+enum BusinessStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
 enum BannerTargetType {
   BUSINESS
   CATEGORY
@@ -32,15 +39,15 @@ enum UpdateType {
 }
 
 enum UserProvider {
-  local
-  facebook
-  google
+  LOCAL
+  FACEBOOK
+  GOOGLE
 }
 
 enum UserStatus {
-  active
-  suspended
-  deleted
+  ACTIVE
+  SUSPENDED
+  DELETED
 }
 
 model SystemConfig {
@@ -79,18 +86,18 @@ model User {
   email         String  @unique
   password_hash String?
 
-  provider    UserProvider @default(local)
+  provider    UserProvider @default(LOCAL)
   provider_id String?
 
-  nombre   String
-  apellido String
-  telefono String?
-  foto_url String?
+  first_name   String
+  last_name String
+  phone String?
+  photo_url String?
 
   email_verified    Boolean @default(false)
   telefono_verified Boolean @default(false)
 
-  estado UserStatus @default(active)
+  status UserStatus @default(ACTIVE)
 
   last_login_at DateTime?
 
@@ -304,13 +311,13 @@ model Business {
 
   owner_user_id Int?
 
-  nombre_comercial String
-  razon_social     String?
+  trade_name String
+  legal_name     String?
   ruc              String?
-  descripcion      String?
+  description      String?
   logo_url         String?
 
-  estado String
+  status BusinessStatus @default(PENDING)
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -321,8 +328,8 @@ model Business {
 model ProductCategory {
   id Int @id @default(autoincrement())
 
-  nombre      String
-  descripcion String?
+  name      String
+  description String?
 
   parent_id Int?
 
@@ -340,13 +347,13 @@ model ProductCategory {
 model Product {
   id Int @id @default(autoincrement())
 
-  nombre      String
-  descripcion String?
+  name      String
+  description String?
 
   barcode String? @unique
 
-  marca         String?
-  unidad_medida String?
+  brand         String?
+  unit_of_measurement String?
 
   category_id Int?
 

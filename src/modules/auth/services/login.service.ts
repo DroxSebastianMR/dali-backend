@@ -44,7 +44,7 @@ export class LoginService {
 
     if (
       !user ||
-      user.estado !== UserStatus.active ||
+      user.status !== UserStatus.ACTIVE ||
       !user.password_hash
     ) {
       throw new UnauthorizedException("Credenciales inválidas");
