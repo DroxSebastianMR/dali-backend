@@ -7,6 +7,7 @@ import { FEATURE_MODULES_AUTH } from '@/modules/auth';
 import { FEATURE_MODULES_NOTIFICATIONS } from '@/modules/notifications';
 import { FEATURE_MODULES_USERS } from '@/modules/users';
 import { FEATURE_MODULES_HOME } from '@/modules/home';
+import { FEATURE_MODULES_SCANNER } from '@/modules/scanner';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { FEATURE_MODULES_HOME } from '@/modules/home';
     ...FEATURE_MODULES_USERS,
     ...FEATURE_MODULES_AUTH,
     ...FEATURE_MODULES_NOTIFICATIONS,
-    ...FEATURE_MODULES_HOME
+    ...FEATURE_MODULES_HOME,
+    ...FEATURE_MODULES_SCANNER
   ],
   controllers: [],
   providers: [],
