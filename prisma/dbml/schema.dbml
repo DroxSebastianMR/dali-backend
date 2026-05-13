@@ -1,0 +1,312 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table SystemConfig {
+  id Int [pk, increment]
+  environment String [unique, not null]
+  backend_name String [not null]
+  backend_version String [not null]
+  maintenance_enabled Boolean [not null]
+  maintenance_message String
+  maintenance_end DateTime
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  appConfigs AppConfig [not null]
+}
+
+Table AppConfig {
+  id Int [pk, increment]
+  system_config_id Int [not null]
+  platform String [not null]
+  current_version String [not null]
+  min_supported_version String [not null]
+  update_type UpdateType [not null]
+  update_message String
+  store_url String
+  active Boolean [not null, default: true]
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  systemConfig SystemConfig [not null]
+
+  indexes {
+    (system_config_id, platform) [unique]
+  }
+}
+
+Table User {
+  id Int [pk, increment]
+  email String [unique, not null]
+  password_hash String
+  provider UserProvider [not null, default: 'LOCAL']
+  provider_id String
+  first_name String [not null]
+  last_name String [not null]
+  phone String
+  photo_url String
+  email_verified Boolean [not null, default: false]
+  telefono_verified Boolean [not null, default: false]
+  status UserStatus [not null, default: 'ACTIVE']
+  last_login_at DateTime
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  deleted_at DateTime
+  user_roles UserRole [not null]
+  refresh_tokens RefreshToken [not null]
+  user_devices UserDevice [not null]
+  notifications Notification [not null]
+  notification_prefs NotificationPreference [not null]
+  reset_password_tokens ResetPasswordToken [not null]
+  home_banners HomeBanner [not null]
+}
+
+Table UserRole {
+  user_id Int [not null]
+  role_id Int [not null]
+  assigned_at DateTime [default: `now()`, not null]
+  user User [not null]
+  role Role [not null]
+
+  indexes {
+    (user_id, role_id) [pk]
+  }
+}
+
+Table Role {
+  id Int [pk, increment]
+  code String [unique, not null]
+  name String
+  description String
+  created_at DateTime [default: `now()`, not null]
+  user_roles UserRole [not null]
+}
+
+Table RefreshToken {
+  id Int [pk, increment]
+  user_id Int [not null]
+  user User [not null]
+  token_hash String [unique, not null]
+  device_id String
+  device_name String
+  is_revoked Boolean [not null, default: false]
+  revoked_at DateTime
+  expires_at DateTime [not null]
+  last_used_at DateTime
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+}
+
+Table UserDevice {
+  id Int [pk, increment]
+  user_id Int [not null]
+  user User [not null]
+  device_id String [not null]
+  device_token String [unique, not null]
+  platform String [not null]
+  model String
+  last_used_at DateTime [default: `now()`, not null]
+}
+
+Table Notification {
+  id Int [pk, increment]
+  user_id Int [not null]
+  user User [not null]
+  business_id Int
+  title String [not null]
+  body String [not null]
+  type String [not null]
+  is_read Boolean [not null, default: false]
+  metadata Json
+  created_at DateTime [default: `now()`, not null]
+}
+
+Table NotificationPreference {
+  id Int [pk, increment]
+  user_id Int [not null]
+  user User [not null]
+  channel String [not null]
+  notification_type String [not null]
+  enabled Boolean [not null, default: true]
+
+  indexes {
+    (user_id, channel, notification_type) [unique]
+  }
+}
+
+Table ResetPasswordToken {
+  id Int [pk, increment]
+  user_id Int [not null]
+  token_hash String [unique, not null]
+  expires_at DateTime [not null]
+  used_at DateTime
+  request_ip String
+  user_agent String
+  created_at DateTime [default: `now()`, not null]
+  user User [not null]
+}
+
+Table HomeBanner {
+  id Int [pk, increment]
+  title String [not null]
+  subtitle String
+  image_url String [not null]
+  background_color String
+  badge_text String
+  badge_color String
+  type BannerType [not null]
+  cta_text String
+  priority Int [not null, default: 0]
+  starts_at DateTime
+  expires_at DateTime
+  is_active Boolean [not null, default: true]
+  created_by Int
+  creator User
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  targets BannerTarget [not null]
+  locations BannerLocation [not null]
+}
+
+Table BannerTarget {
+  id Int [pk, increment]
+  banner_id Int [not null]
+  banner HomeBanner [not null]
+  target_type BannerTargetType [not null]
+  business_id Int
+  business Business
+  category_id Int
+  category ProductCategory
+  product_id Int
+  product Product
+  search_query String
+  external_url String
+  created_at DateTime [default: `now()`, not null]
+}
+
+Table BannerLocation {
+  id Int [pk, increment]
+  banner_id Int [not null]
+  banner HomeBanner [not null]
+  country String
+  state String
+  city String
+  district String
+  latitude Decimal
+  longitude Decimal
+  radius_km Int
+  created_at DateTime [default: `now()`, not null]
+}
+
+Table Business {
+  id Int [pk, increment]
+  owner_user_id Int
+  trade_name String [not null]
+  legal_name String
+  ruc String
+  description String
+  logo_url String
+  status BusinessStatus [not null, default: 'PENDING']
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  banner_targets BannerTarget [not null]
+}
+
+Table ProductCategory {
+  id Int [pk, increment]
+  name String [not null]
+  description String
+  parent_id Int
+  parent ProductCategory
+  children ProductCategory [not null]
+  created_at DateTime [default: `now()`, not null]
+  banner_targets BannerTarget [not null]
+  products Product [not null]
+}
+
+Table Product {
+  id Int [pk, increment]
+  name String [not null]
+  description String
+  barcode String [unique]
+  brand String
+  unit_of_measurement String
+  category_id Int
+  category ProductCategory
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  banner_targets BannerTarget [not null]
+}
+
+Enum BannerType {
+  PROMOTION
+  BUSINESS
+  EVENT
+  NEARBY
+  RECOMMENDATION
+}
+
+Enum BusinessStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+Enum BannerTargetType {
+  BUSINESS
+  CATEGORY
+  PRODUCT
+  PROMOTION
+  SEARCH
+  EXTERNAL_LINK
+}
+
+Enum UpdateType {
+  PATCH
+  MINOR
+  MAJOR
+}
+
+Enum UserProvider {
+  LOCAL
+  FACEBOOK
+  GOOGLE
+}
+
+Enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+Ref: AppConfig.system_config_id > SystemConfig.id
+
+Ref: UserRole.user_id > User.id [delete: Cascade]
+
+Ref: UserRole.role_id > Role.id [delete: Cascade]
+
+Ref: RefreshToken.user_id > User.id [delete: Cascade]
+
+Ref: UserDevice.user_id > User.id [delete: Cascade]
+
+Ref: Notification.user_id > User.id [delete: Cascade]
+
+Ref: NotificationPreference.user_id > User.id [delete: Cascade]
+
+Ref: ResetPasswordToken.user_id > User.id [delete: Cascade]
+
+Ref: HomeBanner.created_by > User.id
+
+Ref: BannerTarget.banner_id > HomeBanner.id [delete: Cascade]
+
+Ref: BannerTarget.business_id > Business.id
+
+Ref: BannerTarget.category_id > ProductCategory.id
+
+Ref: BannerTarget.product_id > Product.id
+
+Ref: BannerLocation.banner_id > HomeBanner.id [delete: Cascade]
+
+Ref: ProductCategory.parent_id - ProductCategory.id
+
+Ref: Product.category_id > ProductCategory.id
