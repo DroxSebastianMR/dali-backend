@@ -57,6 +57,7 @@ Table User {
   notifications Notification [not null]
   notification_prefs NotificationPreference [not null]
   reset_password_tokens ResetPasswordToken [not null]
+  sales Sale [not null]
   home_banners HomeBanner [not null]
   owned_businesses Business [not null]
 }
@@ -227,6 +228,8 @@ Table Business {
   banner_targets BannerTarget [not null]
   locations BusinessLocation [not null]
   business_documents BusinessDocument [not null]
+  sales Sale [not null]
+  payment_methods BusinessPaymentMethod [not null]
 }
 
 Table BusinessLocation {
@@ -252,6 +255,22 @@ Table BusinessLocation {
   business_hours BusinessHour [not null]
   special_hours BusinessSpecialHour [not null]
   inventories Inventory [not null]
+  sales Sale [not null]
+}
+
+Table BusinessPaymentMethod {
+  id Int [pk, increment]
+  business_id Int [not null]
+  type PaymentMethodType [not null]
+  name String
+  account_name String
+  account_number String
+  qr_image_url String
+  is_active Boolean [not null, default: true]
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  business Business [not null]
+  sales Sale [not null]
 }
 
 Table BusinessHour {
@@ -366,6 +385,7 @@ Table Product {
   images ProductImage [not null]
   inventories Inventory [not null]
   prices ProductPrice [not null]
+  sale_items SaleItem [not null]
   banner_targets BannerTarget [not null]
 }
 
@@ -423,6 +443,40 @@ Table InventoryMovement {
   inventory Inventory [not null]
 }
 
+Table Sale {
+  id Int [pk, increment]
+  business_id Int [not null]
+  business_location_id Int
+  user_id Int
+  payment_method_id Int
+  status SaleStatus [not null, default: 'PAID']
+  payment_status PaymentStatus [not null, default: 'PAID']
+  subtotal Decimal [not null]
+  discount Decimal [not null, default: 0]
+  tax Decimal [not null, default: 0]
+  total Decimal [not null]
+  notes String
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  business Business [not null]
+  location BusinessLocation
+  user User
+  payment_method BusinessPaymentMethod
+  items SaleItem [not null]
+}
+
+Table SaleItem {
+  id Int [pk, increment]
+  sale_id Int [not null]
+  product_id Int [not null]
+  quantity Int [not null]
+  unit_price Decimal [not null]
+  total_price Decimal [not null]
+  created_at DateTime [default: `now()`, not null]
+  sale Sale [not null]
+  product Product [not null]
+}
+
 Enum BannerType {
   PROMOTION
   BUSINESS
@@ -466,6 +520,17 @@ Enum BusinessStatus {
   DELETED
 }
 
+Enum PaymentMethodType {
+  CASH
+  YAPE
+  PLIN
+  CARD
+  VISA
+  MASTERCARD
+  BANK_TRANSFER
+  DIGITAL_WALLET
+}
+
 Enum InventoryMovementType {
   IN
   OUT
@@ -489,6 +554,20 @@ Enum BusinessDocumentStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+Enum SaleStatus {
+  PENDING
+  PAID
+  CANCELLED
+  REFUNDED
+}
+
+Enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
 }
 
 Ref: AppConfig.system_config_id > SystemConfig.id
@@ -523,6 +602,8 @@ Ref: Business.owner_user_id > User.id
 
 Ref: BusinessLocation.business_id > Business.id [delete: Cascade]
 
+Ref: BusinessPaymentMethod.business_id > Business.id [delete: Cascade]
+
 Ref: BusinessHour.location_id > BusinessLocation.id [delete: Cascade]
 
 Ref: BusinessSpecialHour.location_id > BusinessLocation.id [delete: Cascade]
@@ -546,3 +627,15 @@ Ref: Inventory.product_id > Product.id [delete: Cascade]
 Ref: ProductPrice.product_id > Product.id [delete: Cascade]
 
 Ref: InventoryMovement.inventory_id > Inventory.id [delete: Cascade]
+
+Ref: Sale.business_id > Business.id
+
+Ref: Sale.business_location_id > BusinessLocation.id
+
+Ref: Sale.user_id > User.id
+
+Ref: Sale.payment_method_id > BusinessPaymentMethod.id
+
+Ref: SaleItem.sale_id > Sale.id [delete: Cascade]
+
+Ref: SaleItem.product_id > Product.id
