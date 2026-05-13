@@ -58,6 +58,7 @@ Table User {
   notification_prefs NotificationPreference [not null]
   reset_password_tokens ResetPasswordToken [not null]
   home_banners HomeBanner [not null]
+  owned_businesses Business [not null]
 }
 
 Table UserRole {
@@ -200,41 +201,226 @@ Table BannerLocation {
 Table Business {
   id Int [pk, increment]
   owner_user_id Int
+  owner User
   trade_name String [not null]
   legal_name String
-  ruc String
+  ruc String [unique]
   description String
   logo_url String
+  cover_image_url String
+  email String
+  phone String
+  whatsapp String
+  website_url String
+  instagram_url String
+  facebook_url String
+  tiktok_url String
   status BusinessStatus [not null, default: 'PENDING']
+  is_verified Boolean [not null, default: false]
+  verified_at DateTime
+  average_rating Decimal
+  total_reviews Int [not null, default: 0]
+  staff_names String[] [not null]
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime [not null]
+  deleted_at DateTime
   banner_targets BannerTarget [not null]
+  locations BusinessLocation [not null]
+  business_documents BusinessDocument [not null]
+}
+
+Table BusinessLocation {
+  id Int [pk, increment]
+  business_id Int [not null]
+  business Business [not null]
+  name String
+  address String [not null]
+  reference String
+  country String
+  state String
+  city String
+  district String
+  latitude Decimal [not null]
+  longitude Decimal [not null]
+  phone String
+  is_main Boolean [not null, default: false]
+  delivery_available Boolean [not null, default: false]
+  pickup_available Boolean [not null, default: true]
+  is_active Boolean [not null, default: true]
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  business_hours BusinessHour [not null]
+  special_hours BusinessSpecialHour [not null]
+  inventories Inventory [not null]
+}
+
+Table BusinessHour {
+  id Int [pk, increment]
+  location_id Int [not null]
+  day_of_week Int [not null]
+  open_time String [not null]
+  close_time String [not null]
+  is_closed Boolean [not null, default: false]
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  location BusinessLocation [not null]
+
+  indexes {
+    (location_id, day_of_week) [unique]
+  }
+}
+
+Table BusinessSpecialHour {
+  id Int [pk, increment]
+  location_id Int [not null]
+  date DateTime [not null]
+  open_time String
+  close_time String
+  is_closed Boolean [not null, default: false]
+  reason String
+  created_at DateTime [default: `now()`, not null]
+  location BusinessLocation [not null]
+
+  indexes {
+    (location_id, date) [unique]
+  }
+}
+
+Table BusinessDocument {
+  id Int [pk, increment]
+  business_id Int [not null]
+  type BusinessDocumentType [not null]
+  file_url String [not null]
+  file_name String
+  status BusinessDocumentStatus [not null, default: 'PENDING']
+  rejection_reason String
+  uploaded_by Int
+  reviewed_by Int
+  reviewed_at DateTime
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  business Business [not null]
+}
+
+Table ProductType {
+  id Int [pk, increment]
+  name String [unique, not null]
+  description String
+  created_at DateTime [default: `now()`, not null]
+  products Product [not null]
+}
+
+Table ProductBrand {
+  id Int [pk, increment]
+  name String [unique, not null]
+  logo_url String
+  description String
+  created_at DateTime [default: `now()`, not null]
+  products Product [not null]
 }
 
 Table ProductCategory {
   id Int [pk, increment]
   name String [not null]
+  slug String [unique, not null]
   description String
+  image_url String
+  icon String
+  is_active Boolean [not null, default: true]
+  sort_order Int [not null, default: 0]
   parent_id Int
   parent ProductCategory
   children ProductCategory [not null]
   created_at DateTime [default: `now()`, not null]
-  banner_targets BannerTarget [not null]
+  updated_at DateTime [not null]
   products Product [not null]
+  banner_targets BannerTarget [not null]
 }
 
 Table Product {
   id Int [pk, increment]
   name String [not null]
+  slug String [unique, not null]
+  short_description String
   description String
+  sku String [unique]
   barcode String [unique]
-  brand String
-  unit_of_measurement String
+  type_id Int
+  type ProductType
   category_id Int
   category ProductCategory
+  brand_id Int
+  brand ProductBrand
+  unit_of_measurement String
+  weight Decimal
+  height Decimal
+  width Decimal
+  length Decimal
+  requires_shipping Boolean [not null, default: true]
+  is_active Boolean [not null, default: true]
+  seo_title String
+  seo_description String
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime [not null]
+  deleted_at DateTime
+  images ProductImage [not null]
+  inventories Inventory [not null]
+  prices ProductPrice [not null]
   banner_targets BannerTarget [not null]
+}
+
+Table ProductImage {
+  id Int [pk, increment]
+  product_id Int [not null]
+  image_url String [not null]
+  is_main Boolean [not null, default: false]
+  sort_order Int [not null, default: 0]
+  created_at DateTime [default: `now()`, not null]
+  product Product [not null]
+}
+
+Table Inventory {
+  id Int [pk, increment]
+  business_location_id Int [not null]
+  product_id Int [not null]
+  stock Int [not null, default: 0]
+  reserved_stock Int [not null, default: 0]
+  min_stock Int [not null, default: 0]
+  max_stock Int
+  cost_price Decimal
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  business_location BusinessLocation [not null]
+  product Product [not null]
+  movements InventoryMovement [not null]
+
+  indexes {
+    (business_location_id, product_id) [unique]
+  }
+}
+
+Table ProductPrice {
+  id Int [pk, increment]
+  product_id Int [not null]
+  name String
+  price Decimal [not null]
+  compare_at_price Decimal
+  currency String [not null, default: 'PEN']
+  is_active Boolean [not null, default: true]
+  starts_at DateTime
+  expires_at DateTime
+  created_at DateTime [default: `now()`, not null]
+  product Product [not null]
+}
+
+Table InventoryMovement {
+  id Int [pk, increment]
+  inventory_id Int [not null]
+  type InventoryMovementType [not null]
+  quantity Int [not null]
+  reason String
+  created_at DateTime [default: `now()`, not null]
+  inventory Inventory [not null]
 }
 
 Enum BannerType {
@@ -243,13 +429,6 @@ Enum BannerType {
   EVENT
   NEARBY
   RECOMMENDATION
-}
-
-Enum BusinessStatus {
-  PENDING
-  ACTIVE
-  SUSPENDED
-  DELETED
 }
 
 Enum BannerTargetType {
@@ -277,6 +456,39 @@ Enum UserStatus {
   ACTIVE
   SUSPENDED
   DELETED
+}
+
+Enum BusinessStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  REJECTED
+  DELETED
+}
+
+Enum InventoryMovementType {
+  IN
+  OUT
+  ADJUSTMENT
+  SALE
+  RETURN
+}
+
+Enum BusinessDocumentType {
+  DNI
+  RUC
+  LICENSE
+  SANITARY_PERMIT
+  TAX_DOCUMENT
+  BUSINESS_PHOTO
+  LOGO
+  OTHER
+}
+
+Enum BusinessDocumentStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 Ref: AppConfig.system_config_id > SystemConfig.id
@@ -307,6 +519,30 @@ Ref: BannerTarget.product_id > Product.id
 
 Ref: BannerLocation.banner_id > HomeBanner.id [delete: Cascade]
 
+Ref: Business.owner_user_id > User.id
+
+Ref: BusinessLocation.business_id > Business.id [delete: Cascade]
+
+Ref: BusinessHour.location_id > BusinessLocation.id [delete: Cascade]
+
+Ref: BusinessSpecialHour.location_id > BusinessLocation.id [delete: Cascade]
+
+Ref: BusinessDocument.business_id > Business.id [delete: Cascade]
+
 Ref: ProductCategory.parent_id - ProductCategory.id
 
+Ref: Product.type_id > ProductType.id
+
 Ref: Product.category_id > ProductCategory.id
+
+Ref: Product.brand_id > ProductBrand.id
+
+Ref: ProductImage.product_id > Product.id [delete: Cascade]
+
+Ref: Inventory.business_location_id > BusinessLocation.id [delete: Cascade]
+
+Ref: Inventory.product_id > Product.id [delete: Cascade]
+
+Ref: ProductPrice.product_id > Product.id [delete: Cascade]
+
+Ref: InventoryMovement.inventory_id > Inventory.id [delete: Cascade]
