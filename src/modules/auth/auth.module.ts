@@ -14,6 +14,7 @@ import { RecoverPasswordController } from './controllers/recover-password.contro
 import { RecoverdPasswordService } from './services/recover-password.service';
 import { ResetPasswordController } from './controllers/reset-password.controller';
 import { ResetPasswordService } from './services/reset-password.service';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ResetPasswordService } from './services/reset-password.service';
     JwtModule.register({
       secret: process.env.JWT_ACCESS_SECRET,
     }),
+    EmailModule,
   ],
   controllers: [AuthController, RecoverPasswordController, ResetPasswordController],
   providers: [
