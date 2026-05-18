@@ -6,7 +6,7 @@ import { EmailService } from "@/modules/email/services/email.service";
 import { recoveryPasswordTemplate } from "@/modules/email/templates/recovery-password.template";
 
 @Injectable()
-export class RecoverdPasswordService {
+export class RecoverPasswordService {
   constructor(
     private prisma: PrismaService,
     private emailService: EmailService,
@@ -17,7 +17,6 @@ export class RecoverdPasswordService {
       where: { email },
     });
 
-    // 🔐 seguridad: no revelar si existe o no
     if (!user) {
       return {
         status: "OK",
@@ -25,7 +24,6 @@ export class RecoverdPasswordService {
       };
     }
 
-    // ❌ invalidar tokens anteriores
     await this.prisma.resetPasswordToken.updateMany({
       where: {
         user_id: user.id,
@@ -36,7 +34,6 @@ export class RecoverdPasswordService {
       },
     });
 
-    // 🔑 generar código
     const code = Math.random()
       .toString(36)
       .substring(2, 8)
