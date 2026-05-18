@@ -10,11 +10,10 @@ import { LoginService } from './services/login.service';
 import { TokenService } from './services/token.service';
 import { PasswordService } from './services/password.service';
 import { LogoutService } from './services/logout.service';
-import { RecoverPasswordController } from './controllers/recover-password.controller';
-import { RecoverdPasswordService } from './services/recover-password.service';
-import { ResetPasswordController } from './controllers/reset-password.controller';
+import { RecoverPasswordService } from './services/recover-password.service';
 import { ResetPasswordService } from './services/reset-password.service';
 import { EmailModule } from '../email/email.module';
+import { VerifyResetTokenService } from './services/verify-reset-token.service';
 
 @Module({
   imports: [
@@ -24,7 +23,7 @@ import { EmailModule } from '../email/email.module';
     }),
     EmailModule,
   ],
-  controllers: [AuthController, RecoverPasswordController, ResetPasswordController],
+  controllers: [AuthController],
   providers: [
     AuthService,
     PrismaService,
@@ -33,7 +32,8 @@ import { EmailModule } from '../email/email.module';
     LoginService,
     TokenService,
     PasswordService,
-    RecoverdPasswordService,
+    RecoverPasswordService,
+    VerifyResetTokenService,
     ResetPasswordService,
     JwtStrategy],
   exports: [PassportModule, JwtStrategy]

@@ -15,12 +15,24 @@ import { LoginUserDto } from '../dtos/login-user.dto';
 import { LogoutSchema } from '../schema/logout.schema';
 import { LogoutDTO } from '../dtos/logout.dto';
 import { LogoutService } from '../services/logout.service';
+import { RecoverPasswordDTO } from '../dtos/recover-password.dto';
+import { RecoverPasswordSchema } from '../schema/recover-password.schema';
+import { RecoverPasswordService } from '../services/recover-password.service';
+import { VerifyResetTokenService } from '../services/verify-reset-token.service';
+import { ResetPasswordService } from '../services/reset-password.service';
+import { VerifyResetTokenSchema } from '../schema/verify-reset-token.schema';
+import { VerifyResetTokenDTO } from '../dtos/verify-reset-token.dto';
+import { ResetPasswordDTO } from '../dtos/reset-password.dto';
+import { ResetPasswordSchema } from '../schema/reset-password.schema';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService,
               private readonly logoutService: LogoutService,
+              private readonly recoverPasswordService: RecoverPasswordService,
+              private readonly verifyResetTokenService: VerifyResetTokenService,
+              private readonly resetPasswordService: ResetPasswordService,
   ) {}
 
   @Post('login')
@@ -54,5 +66,36 @@ export class AuthController {
     body: RefreshTokenDTO,
   ) {
     return this.authService.refreshToken(body);
+  }
+
+  @Post('recover-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Solicitud de recuperación de contrasñea ' })
+  @ApiResponse({ status: 200, description: 'Si el correo existe, se enviará un email' })
+  async recoverPassword(
+      @Body(new ValidationPipe(RecoverPasswordSchema))  body: RecoverPasswordDTO,
+  ) {
+      return this.recoverPasswordService.recoverPassword(body);
+  }
+
+  @Post('verify-reset-token')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verificar validez del token de restablecimiento de contraseña '})
+  @ApiResponse({ status: 200, description: 'Resultado de la verificación del token '})
+  async verifyResetToken(
+    @Body(new ValidationPipe(VerifyResetTokenSchema)) body: VerifyResetTokenDTO,
+  ) {
+    return this.verifyResetTokenService.verifyToken(body);
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Restablecer contraseña'})
+  @ApiResponse({ status: 200, description: 'Contraseña actualizada correctamente'})
+  @ApiResponse({ status: 400, description: 'Token inválido o expirado'})
+  async resetPassword(
+      @Body(new ValidationPipe(ResetPasswordSchema)) body: ResetPasswordDTO,
+  ) {
+      return this.resetPasswordService.resetPassword(body);
   }
 }
