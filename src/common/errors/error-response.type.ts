@@ -1,4 +1,4 @@
-import { ErrorCode } from "./error-codes";
+import { ErrorCode } from './error-codes';
 
 export type ErrorResponse = {
   statusCode: number;

@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 
 import { PrismaService } from '@/common/prisma/prisma.service';
 import { mapAuthorization } from '@/modules/auth/mappers/authorization.mapper';
@@ -12,9 +9,7 @@ import { UserStatus } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async me(userId: number) {
     const user = await this.findActiveUserById(userId);
@@ -40,15 +35,11 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new UnauthorizedException(
-        'Usuario no encontrado',
-      );
+      throw new UnauthorizedException('Usuario no encontrado');
     }
 
     if (user.status !== UserStatus.ACTIVE) {
-      throw new UnauthorizedException(
-        'Usuario no válido',
-      );
+      throw new UnauthorizedException('Usuario no válido');
     }
 
     return user;
@@ -58,11 +49,9 @@ export class UsersService {
     return {
       user: mapUser(user),
 
-      authorization:
-        mapAuthorization(user),
+      authorization: mapAuthorization(user),
 
-      meta:
-        mapMeta(),
+      meta: mapMeta(),
     };
   }
 }

@@ -1,9 +1,9 @@
-import { PrismaService } from "@/common/prisma/prisma.service";
-import { Injectable } from "@nestjs/common";
-import { createHash } from "crypto";
-import { RecoverPasswordInput } from "@/modules/auth/schema/recover-password.schema";
-import { EmailService } from "@/modules/email/services/email.service";
-import { recoveryPasswordTemplate } from "@/modules/email/templates/recovery-password.template";
+import { PrismaService } from '@/common/prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
+import { createHash } from 'crypto';
+import { RecoverPasswordInput } from '@/modules/auth/schema/recover-password.schema';
+import { EmailService } from '@/modules/email/services/email.service';
+import { recoveryPasswordTemplate } from '@/modules/email/templates/recovery-password.template';
 
 @Injectable()
 export class RecoverPasswordService {
@@ -19,8 +19,8 @@ export class RecoverPasswordService {
 
     if (!user) {
       return {
-        status: "OK",
-        message: "Si el correo existe, se enviará un código de recuperación",
+        status: 'OK',
+        message: 'Si el correo existe, se enviará un código de recuperación',
       };
     }
 
@@ -34,19 +34,12 @@ export class RecoverPasswordService {
       },
     });
 
-    const code = Math.random()
-      .toString(36)
-      .substring(2, 8)
-      .toUpperCase();
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
 
-    const tokenHash = createHash("sha256")
-      .update(code)
-      .digest("hex");
+    const tokenHash = createHash('sha256').update(code).digest('hex');
 
     const expires = new Date();
     expires.setMinutes(expires.getMinutes() + 15);
-
-    // 💾 guardar en DB
     await this.prisma.resetPasswordToken.create({
       data: {
         user_id: user.id,
@@ -56,19 +49,19 @@ export class RecoverPasswordService {
     });
 
     const html = recoveryPasswordTemplate({
-      name: user.first_name ?? "Usuario",
+      name: user.first_name ?? 'Usuario',
       code,
     });
 
     await this.emailService.sendEmail({
       to: user.email,
-      subject: "Código de recuperación de contraseña",
+      subject: 'Código de recuperación de contraseña',
       html,
     });
 
     return {
-      status: "OK",
-      message: "Si el correo existe, se enviará un código de recuperación",
+      status: 'OK',
+      message: 'Si el correo existe, se enviará un código de recuperación',
     };
   }
 }

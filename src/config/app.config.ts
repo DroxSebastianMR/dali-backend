@@ -9,12 +9,8 @@ export default registerAs(
     description: 'Backend de DALI',
     version: '1.0.0',
     port: Number(process.env.PORT) || 3000,
-    env:
-      process.env.NODE_ENV ||
-      'development',
+    env: process.env.NODE_ENV || 'development',
 
-    frontendUrl:
-      process.env.FRONTEND_URL ||
-      'http://localhost:5173',
+    frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
   }),
 );

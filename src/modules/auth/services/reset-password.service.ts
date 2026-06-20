@@ -1,19 +1,15 @@
-import { PrismaService } from "@/common/prisma/prisma.service";
-import { BadRequestException, Injectable } from "@nestjs/common";
-import { ResetPasswordInput } from "../schema/reset-password.schema";
-import { createHash } from "crypto";
-import { hashPassword } from "@/common/prisma/utils/password.util";
-
+import { PrismaService } from '@/common/prisma/prisma.service';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { ResetPasswordInput } from '../schema/reset-password.schema';
+import { createHash } from 'crypto';
+import { hashPassword } from '@/common/prisma/utils/password.util';
 
 @Injectable()
-
 export class ResetPasswordService {
   constructor(private prisma: PrismaService) {}
 
   async resetPassword({ token, new_password }: ResetPasswordInput) {
-    const tokenHash = createHash('sha256')
-      .update(token)
-      .digest('hex');
+    const tokenHash = createHash('sha256').update(token).digest('hex');
 
     const resetToken = await this.prisma.resetPasswordToken.findUnique({
       where: {
@@ -64,6 +60,6 @@ export class ResetPasswordService {
     return {
       status: 'OK',
       message: 'Contraseña actualizada correctamente',
-    }
+    };
   }
 }

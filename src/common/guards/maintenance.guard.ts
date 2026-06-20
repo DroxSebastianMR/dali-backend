@@ -3,10 +3,10 @@ import {
   ExecutionContext,
   Injectable,
   ServiceUnavailableException,
-} from "@nestjs/common";
-import { PrismaService } from "@/common/prisma/prisma.service";
-import { ErrorFactory } from "@/common/errors/error.factory";
-import { ErrorCode } from "@/common/errors/error-codes";
+} from '@nestjs/common';
+import { PrismaService } from '@/common/prisma/prisma.service';
+import { ErrorFactory } from '@/common/errors/error.factory';
+import { ErrorCode } from '@/common/errors/error-codes';
 
 type MaintenanceState = {
   enabled: boolean;
@@ -35,9 +35,9 @@ export class MaintenanceGuard implements CanActivate {
     throw new ServiceUnavailableException(
       ErrorFactory.create({
         statusCode: 503,
-        error: "SERVICE_UNAVAILABLE",
+        error: 'SERVICE_UNAVAILABLE',
         code: ErrorCode.SYSTEM_MAINTENANCE,
-        message: maintenance.message ?? "Sistema en mantenimiento",
+        message: maintenance.message ?? 'Sistema en mantenimiento',
         path: request.url,
         meta: {
           maintenance: true,
@@ -48,7 +48,7 @@ export class MaintenanceGuard implements CanActivate {
   }
 
   private isStatusRoute(request: any): boolean {
-    return request.method === "GET" && request.url === "/system/status";
+    return request.method === 'GET' && request.url === '/system/status';
   }
 
   private async getMaintenanceState(): Promise<MaintenanceState> {
@@ -58,7 +58,7 @@ export class MaintenanceGuard implements CanActivate {
       return this.cache;
     }
 
-    const environment = process.env.NODE_ENV ?? "development";
+    const environment = process.env.NODE_ENV ?? 'development';
 
     const config = await this.prisma.systemConfig.findUnique({
       where: { environment },

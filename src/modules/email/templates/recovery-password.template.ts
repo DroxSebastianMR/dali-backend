@@ -1,7 +1,4 @@
-export function recoveryPasswordTemplate(data: {
-  name: string;
-  code: string;
-}) {
+export function recoveryPasswordTemplate(data: { name: string; code: string }) {
   return `
     <div style="font-family: Arial; padding: 20px;">
       <h2>Recuperación de contraseña 🔐</h2>

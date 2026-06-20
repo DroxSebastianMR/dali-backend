@@ -1,13 +1,13 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { UpdateType } from "@prisma/client";
+import { ApiProperty } from '@nestjs/swagger';
+import { UpdateType } from '@prisma/client';
 import {
   BACKEND_STATUS,
   SYSTEM_MODE,
-} from "@/modules/system/Types/system.types";
+} from '@/modules/system/Types/system.types';
 import type {
   BackendStatus,
   SystemMode,
-} from "@/modules/system/Types/system.types";
+} from '@/modules/system/Types/system.types';
 
 class UpdateDTO {
   @ApiProperty({ example: true })
@@ -16,7 +16,7 @@ class UpdateDTO {
   @ApiProperty({ enum: UpdateType })
   type!: UpdateType;
 
-  @ApiProperty({ example: "Actualización obligatoria." })
+  @ApiProperty({ example: 'Actualización obligatoria.' })
   message!: string;
 
   @ApiProperty({ nullable: true })

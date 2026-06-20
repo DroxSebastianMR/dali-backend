@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ValidationPipe } from '@/common/validation/validation.pipe';
@@ -18,9 +12,7 @@ import { HomeBannersSchema } from '@/modules/home/schema/home-banners.schema';
 @ApiTags('Home')
 @Controller('home')
 export class HomeController {
-  constructor(
-    private readonly homeService: HomeService,
-  ) {}
+  constructor(private readonly homeService: HomeService) {}
 
   @Post('banners')
   @HttpCode(HttpStatus.OK)

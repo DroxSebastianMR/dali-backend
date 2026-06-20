@@ -1,5 +1,3 @@
 import appConfig from './app.config';
 
-export const configurations = [
-  appConfig,
-];
+export const configurations = [appConfig];

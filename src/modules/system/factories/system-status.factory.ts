@@ -1,4 +1,4 @@
-import { SystemStatusResponseDTO } from "@/modules/system/dtos/system-status.dto";
+import { SystemStatusResponseDTO } from '@/modules/system/dtos/system-status.dto';
 
 export class SystemStatusFactory {
   static base({

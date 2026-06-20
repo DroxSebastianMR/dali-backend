@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '@/common/prisma/prisma.service';
 import { RefreshTokenInput } from '@/modules/auth/schema/refresh-token.schema';
 import { RefreshTokenService } from './refresh-token.service';
@@ -19,7 +16,7 @@ export class AuthService {
     private readonly loginService: LoginService,
   ) {}
 
-  async login(data: LoginUserDto){
+  async login(data: LoginUserDto) {
     return this.loginService.login(data);
   }
 
@@ -32,7 +29,7 @@ export class AuthService {
       where: { id: stored.user_id },
     });
 
-    if(!user || user.status !== UserStatus.ACTIVE){
+    if (!user || user.status !== UserStatus.ACTIVE) {
       throw new UnauthorizedException('User not valid');
     }
 
@@ -43,13 +40,12 @@ export class AuthService {
 
     const access_token = this.tokenService.signAccessToken(payload);
 
-    const new_refresh_token = 
+    const new_refresh_token =
       await this.refreshTokenService.rotate(refresh_token);
 
     return {
       access_token,
       refresh_token: new_refresh_token,
     };
-      
   }
 }

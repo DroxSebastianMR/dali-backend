@@ -1,6 +1,6 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class VerifyResetTokenDTO {
-    @ApiProperty({ example: 'token-recibido-por-email'})
-    token!: string;
+  @ApiProperty({ example: 'token-recibido-por-email' })
+  token!: string;
 }

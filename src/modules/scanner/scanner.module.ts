@@ -1,10 +1,10 @@
-import { Module } from "@nestjs/common";
+import { Module } from '@nestjs/common';
 
-import { AIModule } from "@/modules/ai/ai.module";
+import { AIModule } from '@/modules/ai/ai.module';
 
-import { ScannerController } from "@/modules/scanner/controllers/scanner.controller";
+import { ScannerController } from '@/modules/scanner/controllers/scanner.controller';
 
-import { ScannerService } from "@/modules/scanner/services/scanner.service";
+import { ScannerService } from '@/modules/scanner/services/scanner.service';
 
 @Module({
   imports: [AIModule],

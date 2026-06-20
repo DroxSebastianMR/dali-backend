@@ -22,9 +22,9 @@ import { FEATURE_MODULES_SCANNER } from '@/modules/scanner';
     ...FEATURE_MODULES_AUTH,
     ...FEATURE_MODULES_NOTIFICATIONS,
     ...FEATURE_MODULES_HOME,
-    ...FEATURE_MODULES_SCANNER
+    ...FEATURE_MODULES_SCANNER,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

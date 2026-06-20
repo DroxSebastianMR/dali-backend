@@ -21,6 +21,4 @@ export const HomeBannersSchema = z.object({
   }),
 });
 
-export type HomeBannersInput = z.infer<
-  typeof HomeBannersSchema
->;
+export type HomeBannersInput = z.infer<typeof HomeBannersSchema>;

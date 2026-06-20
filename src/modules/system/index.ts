@@ -1,5 +1,3 @@
-import { SystemModule } from "@/modules/system/system.module"; 
+import { SystemModule } from '@/modules/system/system.module';
 
-export const FEATURE_MODULES_SYSTEM = [
-    SystemModule,
-];
+export const FEATURE_MODULES_SYSTEM = [SystemModule];

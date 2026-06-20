@@ -1,5 +1,3 @@
-import { ScannerModule } from "./scanner.module"
+import { ScannerModule } from './scanner.module';
 
-export const FEATURE_MODULES_SCANNER = [
-    ScannerModule,
-]
+export const FEATURE_MODULES_SCANNER = [ScannerModule];

@@ -1,26 +1,41 @@
-  import { Injectable, NotFoundException } from "@nestjs/common";
-  import { PrismaService } from "@/common/prisma/prisma.service";
-  import { SystemStatusInput } from "@/modules/system/schema/system-status.schema";
-  import { SystemStatusResponseDTO } from "@/modules/system/dtos/system-status.dto";
-  import { VersionUtil } from "@/modules/system/utils/versions/version.util";
-  import { SystemStatusFactory } from "@/modules/system/factories/system-status.factory";
-  import { UPDATE_MESSAGES } from "@/modules/system/constants/update-messages";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '@/common/prisma/prisma.service';
+import { SystemStatusInput } from '@/modules/system/schema/system-status.schema';
+import { SystemStatusResponseDTO } from '@/modules/system/dtos/system-status.dto';
+import { VersionUtil } from '@/modules/system/utils/versions/version.util';
+import { SystemStatusFactory } from '@/modules/system/factories/system-status.factory';
+import { UPDATE_MESSAGES } from '@/modules/system/constants/update-messages';
 
-  @Injectable()
+@Injectable()
 export class SystemStatusService {
   constructor(private prisma: PrismaService) {}
 
   async getStatus(input: SystemStatusInput): Promise<SystemStatusResponseDTO> {
-    const environment = process.env.NODE_ENV ?? "development";
-    const systemConfig = await this.getSystemConfig(environment, input.platform);
+    const environment = process.env.NODE_ENV ?? 'development';
+    const systemConfig = await this.getSystemConfig(
+      environment,
+      input.platform,
+    );
     const appConfig = this.getAppConfig(systemConfig);
 
     if (this.isMaintenance(systemConfig)) {
-      return this.buildMaintenanceResponse(systemConfig, appConfig, input, environment);
+      return this.buildMaintenanceResponse(
+        systemConfig,
+        appConfig,
+        input,
+        environment,
+      );
     }
 
-    if (this.isUpdateRequired(input.appVersion, appConfig.min_supported_version)) {
-      return this.buildUpdateRequiredResponse(systemConfig, appConfig, input, environment);
+    if (
+      this.isUpdateRequired(input.appVersion, appConfig.min_supported_version)
+    ) {
+      return this.buildUpdateRequiredResponse(
+        systemConfig,
+        appConfig,
+        input,
+        environment,
+      );
     }
 
     return this.buildOkResponse(systemConfig, appConfig, input, environment);
@@ -40,7 +55,7 @@ export class SystemStatusService {
     });
 
     if (!config) {
-      throw new NotFoundException("System offline");
+      throw new NotFoundException('System offline');
     }
 
     return config;
@@ -50,7 +65,7 @@ export class SystemStatusService {
     const appConfig = systemConfig.appConfigs?.[0];
 
     if (!appConfig) {
-      throw new NotFoundException("App configuration not found");
+      throw new NotFoundException('App configuration not found');
     }
 
     return appConfig;
@@ -68,12 +83,12 @@ export class SystemStatusService {
     systemConfig: any,
     appConfig: any,
     input: SystemStatusInput,
-    environment: string
+    environment: string,
   ): SystemStatusResponseDTO {
     return SystemStatusFactory.base({
-      mode: "MAINTENANCE",
+      mode: 'MAINTENANCE',
       environment,
-      backend: this.buildBackend(systemConfig, "MAINTENANCE"),
+      backend: this.buildBackend(systemConfig, 'MAINTENANCE'),
       app: this.buildApp(appConfig, input),
       maintenance: {
         enabled: true,
@@ -87,14 +102,14 @@ export class SystemStatusService {
     systemConfig: any,
     appConfig: any,
     input: SystemStatusInput,
-    environment: string
+    environment: string,
   ): SystemStatusResponseDTO {
     const messages = UPDATE_MESSAGES[appConfig.update_type];
 
     return SystemStatusFactory.base({
-      mode: "UPDATE_REQUIRED",
+      mode: 'UPDATE_REQUIRED',
       environment,
-      backend: this.buildBackend(systemConfig, "OK"),
+      backend: this.buildBackend(systemConfig, 'OK'),
       app: {
         ...this.buildApp(appConfig, input),
         update: {
@@ -112,18 +127,18 @@ export class SystemStatusService {
     systemConfig: any,
     appConfig: any,
     input: SystemStatusInput,
-    environment: string
+    environment: string,
   ): SystemStatusResponseDTO {
     return SystemStatusFactory.base({
-      mode: "OK",
+      mode: 'OK',
       environment,
-      backend: this.buildBackend(systemConfig, "OK"),
+      backend: this.buildBackend(systemConfig, 'OK'),
       app: this.buildApp(appConfig, input),
       maintenance: this.buildNoMaintenance(),
     });
   }
 
-  private buildBackend(systemConfig: any, status: "OK" | "MAINTENANCE") {
+  private buildBackend(systemConfig: any, status: 'OK' | 'MAINTENANCE') {
     return {
       name: systemConfig.backend_name,
       version: systemConfig.backend_version,
