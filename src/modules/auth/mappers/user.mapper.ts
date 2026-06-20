@@ -13,16 +13,12 @@ export function mapUser(user: any) {
 
     status: user.status,
 
-    email_verified:
-      user.email_verified,
+    email_verified: user.email_verified,
 
-    telefono_verified:
-      user.telefono_verified,
+    telefono_verified: user.telefono_verified,
 
-    last_login_at:
-      user.last_login_at,
+    last_login_at: user.last_login_at,
 
-    created_at:
-      user.created_at,
+    created_at: user.created_at,
   };
 }

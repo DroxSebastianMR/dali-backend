@@ -5,13 +5,9 @@ import { PrismaService } from '@/common/prisma/prisma.service';
 import { PushStrategy } from './strategies/push.strategy';
 
 @Module({
-    imports: [],
-    controllers: [NotificationsController],
-    providers: [
-        NotificationsService,
-        PrismaService,
-        PushStrategy
-    ],
-    exports: [NotificationsService],
+  imports: [],
+  controllers: [NotificationsController],
+  providers: [NotificationsService, PrismaService, PushStrategy],
+  exports: [NotificationsService],
 })
-export class NotificationsModule { }
+export class NotificationsModule {}

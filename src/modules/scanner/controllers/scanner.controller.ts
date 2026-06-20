@@ -5,7 +5,7 @@ import {
   Post,
   UploadedFile,
   UseInterceptors,
-} from "@nestjs/common";
+} from '@nestjs/common';
 
 import {
   ApiBody,
@@ -13,72 +13,54 @@ import {
   ApiOperation,
   ApiResponse,
   ApiTags,
-} from "@nestjs/swagger";
+} from '@nestjs/swagger';
 
-import { FileInterceptor } from "@nestjs/platform-express";
-import { ScannerService } from "@/modules/scanner/services/scanner.service";
-import type { UploadedFileType } from "@/modules/scanner/types/uploaded-file.type";
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ScannerService } from '@/modules/scanner/services/scanner.service';
+import type { UploadedFileType } from '@/modules/scanner/types/uploaded-file.type';
 
-@ApiTags("Scanner")
-@Controller("scanner")
+@ApiTags('Scanner')
+@Controller('scanner')
 export class ScannerController {
-  constructor(
-    private readonly scannerService: ScannerService,
-  ) {}
+  constructor(private readonly scannerService: ScannerService) {}
 
-  @Post("analyze")
+  @Post('analyze')
   @HttpCode(HttpStatus.OK)
-
-  @UseInterceptors(
-    FileInterceptor("image"),
-  )
-
-  @ApiConsumes("multipart/form-data")
-
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiConsumes('multipart/form-data')
   @ApiOperation({
-    summary:
-      "Analizar imagen usando inteligencia artificial",
+    summary: 'Analizar imagen usando inteligencia artificial',
   })
-
   @ApiResponse({
     status: 200,
-    description:
-      "Imagen analizada correctamente",
+    description: 'Imagen analizada correctamente',
   })
-
   @ApiResponse({
     status: 400,
-    description:
-      "La imagen enviada es inválida",
+    description: 'La imagen enviada es inválida',
   })
-
   @ApiResponse({
     status: 500,
-    description:
-      "Error interno procesando imagen",
+    description: 'Error interno procesando imagen',
   })
-
   @ApiBody({
     schema: {
-      type: "object",
+      type: 'object',
 
       properties: {
         image: {
-          type: "string",
-          format: "binary",
+          type: 'string',
+          format: 'binary',
         },
       },
 
-      required: ["image"],
+      required: ['image'],
     },
   })
-
   async analyze(
     @UploadedFile()
     file: UploadedFileType,
   ) {
-    return this.scannerService.analyze(
-      file,
-    );
+    return this.scannerService.analyze(file);
   }
 }

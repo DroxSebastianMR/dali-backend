@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from '@/modules/auth/services/auth.service';
 import { RefreshTokenDTO } from '@/modules/auth/dtos/refresh-token.dto';
@@ -28,31 +22,28 @@ import { ResetPasswordSchema } from '../schema/reset-password.schema';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService,
-              private readonly logoutService: LogoutService,
-              private readonly recoverPasswordService: RecoverPasswordService,
-              private readonly verifyResetTokenService: VerifyResetTokenService,
-              private readonly resetPasswordService: ResetPasswordService,
+  constructor(
+    private readonly authService: AuthService,
+    private readonly logoutService: LogoutService,
+    private readonly recoverPasswordService: RecoverPasswordService,
+    private readonly verifyResetTokenService: VerifyResetTokenService,
+    private readonly resetPasswordService: ResetPasswordService,
   ) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login de usuario' })
   @ApiResponse({ status: 200, description: 'Login exitoso' })
-  async login(
-    @Body(new ValidationPipe(LoginUserSchema)) body: LoginUserDto,
-  ){
+  async login(@Body(new ValidationPipe(LoginUserSchema)) body: LoginUserDto) {
     return this.authService.login(body);
   }
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Cerrar Sesión del usuario' })
-  @ApiResponse({ status: 200, description: 'Logout Exitoso', })
+  @ApiResponse({ status: 200, description: 'Logout Exitoso' })
   @ApiResponse({ status: 401, description: 'Token Inválido' })
-  async logout(
-    @Body(new ValidationPipe(LogoutSchema)) body: LogoutDTO,
-  ) {
+  async logout(@Body(new ValidationPipe(LogoutSchema)) body: LogoutDTO) {
     return this.logoutService.logout(body.refresh_token);
   }
 
@@ -71,17 +62,25 @@ export class AuthController {
   @Post('recover-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Solicitud de recuperación de contrasñea ' })
-  @ApiResponse({ status: 200, description: 'Si el correo existe, se enviará un email' })
+  @ApiResponse({
+    status: 200,
+    description: 'Si el correo existe, se enviará un email',
+  })
   async recoverPassword(
-      @Body(new ValidationPipe(RecoverPasswordSchema))  body: RecoverPasswordDTO,
+    @Body(new ValidationPipe(RecoverPasswordSchema)) body: RecoverPasswordDTO,
   ) {
-      return this.recoverPasswordService.recoverPassword(body);
+    return this.recoverPasswordService.recoverPassword(body);
   }
 
   @Post('verify-reset-token')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Verificar validez del token de restablecimiento de contraseña '})
-  @ApiResponse({ status: 200, description: 'Resultado de la verificación del token '})
+  @ApiOperation({
+    summary: 'Verificar validez del token de restablecimiento de contraseña ',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Resultado de la verificación del token ',
+  })
   async verifyResetToken(
     @Body(new ValidationPipe(VerifyResetTokenSchema)) body: VerifyResetTokenDTO,
   ) {
@@ -90,12 +89,15 @@ export class AuthController {
 
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Restablecer contraseña'})
-  @ApiResponse({ status: 200, description: 'Contraseña actualizada correctamente'})
-  @ApiResponse({ status: 400, description: 'Token inválido o expirado'})
+  @ApiOperation({ summary: 'Restablecer contraseña' })
+  @ApiResponse({
+    status: 200,
+    description: 'Contraseña actualizada correctamente',
+  })
+  @ApiResponse({ status: 400, description: 'Token inválido o expirado' })
   async resetPassword(
-      @Body(new ValidationPipe(ResetPasswordSchema)) body: ResetPasswordDTO,
+    @Body(new ValidationPipe(ResetPasswordSchema)) body: ResetPasswordDTO,
   ) {
-      return this.resetPasswordService.resetPassword(body);
+    return this.resetPasswordService.resetPassword(body);
   }
 }

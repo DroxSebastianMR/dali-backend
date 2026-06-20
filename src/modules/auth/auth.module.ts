@@ -35,7 +35,8 @@ import { VerifyResetTokenService } from './services/verify-reset-token.service';
     RecoverPasswordService,
     VerifyResetTokenService,
     ResetPasswordService,
-    JwtStrategy],
-  exports: [PassportModule, JwtStrategy]
+    JwtStrategy,
+  ],
+  exports: [PassportModule, JwtStrategy],
 })
-export class AuthModule { }
+export class AuthModule {}

@@ -1,5 +1,5 @@
-import { ErrorCode } from "./error-codes";
-import { ErrorResponse } from "./error-response.type";
+import { ErrorCode } from './error-codes';
+import { ErrorResponse } from './error-response.type';
 
 export class ErrorFactory {
   static create(params: {

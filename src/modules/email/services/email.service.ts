@@ -12,9 +12,7 @@ export interface SendEmailOptions {
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
 
-  constructor(
-    private readonly mailProvider: NodemailerProvider,
-  ) {}
+  constructor(private readonly mailProvider: NodemailerProvider) {}
 
   async sendEmail(options: SendEmailOptions): Promise<boolean> {
     try {
@@ -22,7 +20,6 @@ export class EmailService {
 
       this.logger.log(`📧 Email enviado a: ${options.to}`);
       return true;
-
     } catch (error) {
       this.logger.error(
         `Error enviando email a ${options.to}`,
