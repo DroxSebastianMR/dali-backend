@@ -7,6 +7,8 @@ import { BannerService } from '@/modules/home/domain/banner/banner.service';
 import { BannerRepository } from '@/modules/home/infrastructure/home.repository';
 import { BannerScorer } from '@/modules/home/domain/banner/banner.scorer';
 import { BannerMapper } from '@/modules/home/domain/banner/banner.mapper';
+import { CarouselService } from './domain/banner/carousel/carousel.service';
+import { CarouselMapper } from './domain/banner/carousel/carousel.mapper';
 
 @Module({
   controllers: [HomeController],
@@ -18,6 +20,8 @@ import { BannerMapper } from '@/modules/home/domain/banner/banner.mapper';
     BannerRepository,
     BannerScorer,
     BannerMapper,
+    CarouselService,
+    CarouselMapper,
   ],
 })
 export class HomeModule {}

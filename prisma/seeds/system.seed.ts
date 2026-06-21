@@ -1,7 +1,4 @@
-import {
-  PrismaClient,
-  UpdateType,
-} from '@prisma/client';
+import { PrismaClient, UpdateType } from '@prisma/client';
 
 export async function seedSystem(prisma: PrismaClient) {
   console.log('🌱 Seeding system config...');
@@ -35,8 +32,7 @@ export async function seedSystem(prisma: PrismaClient) {
 
             update_type: UpdateType.PATCH,
 
-            update_message:
-              'Nueva actualización disponible.',
+            update_message: 'Nueva actualización disponible.',
 
             store_url:
               'https://play.google.com/store/apps/details?id=com.dali.app',
@@ -52,11 +48,9 @@ export async function seedSystem(prisma: PrismaClient) {
 
             update_type: UpdateType.PATCH,
 
-            update_message:
-              'Nueva actualización disponible.',
+            update_message: 'Nueva actualización disponible.',
 
-            store_url:
-              'https://apps.apple.com/app/dali/id123456789',
+            store_url: 'https://apps.apple.com/app/dali/id123456789',
 
             active: true,
           },

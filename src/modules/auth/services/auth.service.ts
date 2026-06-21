@@ -6,6 +6,9 @@ import { TokenService } from './token.service';
 import { LoginService } from './login.service';
 import { LoginUserDto } from '../dtos/login-user.dto';
 import { UserStatus } from '@prisma/client';
+import { SocialLoginService } from './social-login.service';
+import { SocialProvider } from '@/modules/auth/enums/social-provider.enum';
+import { SocialLoginDTO } from '../dtos/social-login.dto';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +17,7 @@ export class AuthService {
     private readonly refreshTokenService: RefreshTokenService,
     private readonly tokenService: TokenService,
     private readonly loginService: LoginService,
+    private readonly socialLoginService: SocialLoginService,
   ) {}
 
   async login(data: LoginUserDto) {
@@ -47,5 +51,17 @@ export class AuthService {
       access_token,
       refresh_token: new_refresh_token,
     };
+  }
+  async socialLogin(dto: SocialLoginDTO) {
+    switch (dto.provider) {
+      case SocialProvider.GOOGLE:
+        return this.socialLoginService.loginWithGoogle(dto.token);
+
+      case SocialProvider.FACEBOOK:
+        throw new Error('Not implemented');
+
+      case SocialProvider.APPLE:
+        throw new Error('Not implemented');
+    }
   }
 }

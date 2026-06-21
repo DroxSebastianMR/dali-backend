@@ -8,6 +8,11 @@ import {
   HomeBannersResponseDTO,
 } from '@/modules/home/dtos/home-banners.dto';
 import { HomeBannersSchema } from '@/modules/home/schema/home-banners.schema';
+import {
+  HomeCarouselsDTO,
+  HomeCarouselsResponseDTO,
+} from '../dtos/home-carousels.dto';
+import { HomeCarouselsSchema } from '../schema/home-carousels.schema';
 
 @ApiTags('Home')
 @Controller('home')
@@ -28,5 +33,21 @@ export class HomeController {
     body: HomeBannersDTO,
   ): Promise<HomeBannersResponseDTO> {
     return this.homeService.getHomeBanners(body);
+  }
+
+  @Post('carousels')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Obtener carruseles del home',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Carruseles obtenidos correctamente',
+  })
+  async getHomeCarousels(
+    @Body(new ValidationPipe(HomeCarouselsSchema))
+    body: HomeCarouselsDTO,
+  ): Promise<HomeCarouselsResponseDTO> {
+    return this.homeService.getHomeCarousels(body);
   }
 }

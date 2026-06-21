@@ -14,6 +14,8 @@ import { RecoverPasswordService } from './services/recover-password.service';
 import { ResetPasswordService } from './services/reset-password.service';
 import { EmailModule } from '../email/email.module';
 import { VerifyResetTokenService } from './services/verify-reset-token.service';
+import { SocialLoginService } from './services/social-login.service';
+import { GoogleProvider } from './providers/google.provider';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { VerifyResetTokenService } from './services/verify-reset-token.service';
     VerifyResetTokenService,
     ResetPasswordService,
     JwtStrategy,
+    SocialLoginService,
+    GoogleProvider,
   ],
   exports: [PassportModule, JwtStrategy],
 })

@@ -4,6 +4,7 @@ import { seedUsers } from './users.seed';
 import { seedRoles } from './roles.seed';
 import { seedSystem } from './system.seed';
 import { seedUserRoles } from './user-roles.seed';
+import { seedBusinesses } from './businesses.seed';
 
 const prisma = new PrismaClient();
 
@@ -15,6 +16,8 @@ async function main() {
   await seedUsers();
 
   await seedUserRoles();
+
+  await seedBusinesses();
 
   await seedSystem(prisma);
 
