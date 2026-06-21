@@ -3,34 +3,29 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export async function seedUserRoles() {
-  const adminRole =
-    await prisma.role.findUnique({
-      where: {
-        code: 'ADMIN',
-      },
-    });
+  const adminRole = await prisma.role.findUnique({
+    where: {
+      code: 'ADMIN',
+    },
+  });
 
-  const customerRole =
-    await prisma.role.findUnique({
-      where: {
-        code: 'CUSTOMER',
-      },
-    });
+  const customerRole = await prisma.role.findUnique({
+    where: {
+      code: 'CUSTOMER',
+    },
+  });
 
-  const businessOwnerRole =
-    await prisma.role.findUnique({
-      where: {
-        code: 'BUSINESS_OWNER',
-      },
-    });
+  const businessOwnerRole = await prisma.role.findUnique({
+    where: {
+      code: 'BUSINESS_OWNER',
+    },
+  });
 
-  const sebastian =
-    await prisma.user.findUnique({
-      where: {
-        email:
-          'SebastianMR08@dali.com',
-      },
-    });
+  const sebastian = await prisma.user.findUnique({
+    where: {
+      email: 'SebastianMR08@dali.com',
+    },
+  });
 
   if (adminRole && sebastian) {
     await prisma.userRole.upsert({
@@ -49,20 +44,13 @@ export async function seedUserRoles() {
       },
     });
 
-    console.log(
-      '✅ ADMIN asignado a Sebastian',
-    );
+    console.log('✅ ADMIN asignado a Sebastian');
   }
 
-  const users =
-    await prisma.user.findMany();
+  const users = await prisma.user.findMany();
 
   for (const user of users) {
-    if (
-      user.email !==
-        'SebastianMR08@dali.com' &&
-      customerRole
-    ) {
+    if (user.email !== 'SebastianMR08@dali.com' && customerRole) {
       await prisma.userRole.upsert({
         where: {
           user_id_role_id: {
@@ -79,9 +67,7 @@ export async function seedUserRoles() {
         },
       });
 
-      console.log(
-        `✅ CUSTOMER asignado a ${user.email}`,
-      );
+      console.log(`✅ CUSTOMER asignado a ${user.email}`);
     }
   }
 }

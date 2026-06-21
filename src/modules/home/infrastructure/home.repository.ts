@@ -31,4 +31,96 @@ export class BannerRepository {
       },
     });
   }
+  async getTopBusinesses() {
+    return this.prisma.business.findMany({
+      where: {
+        status: 'ACTIVE',
+      },
+
+      take: 10,
+
+      orderBy: [
+        {
+          is_verified: 'desc',
+        },
+        {
+          average_rating: 'desc',
+        },
+        {
+          total_reviews: 'desc',
+        },
+      ],
+    });
+  }
+  async getPharmaciesNearby(latitude: number, longitude: number) {
+    void latitude;
+    void longitude;
+
+    return this.prisma.business.findMany({
+      where: {
+        status: 'ACTIVE',
+
+        OR: [
+          {
+            trade_name: {
+              contains: 'farmacia',
+              mode: 'insensitive',
+            },
+          },
+          {
+            trade_name: {
+              contains: 'botica',
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
+
+      include: {
+        locations: {
+          where: {
+            is_active: true,
+          },
+          take: 1,
+        },
+      },
+
+      take: 10,
+
+      orderBy: [
+        {
+          is_verified: 'desc',
+        },
+        {
+          average_rating: 'desc',
+        },
+        {
+          total_reviews: 'desc',
+        },
+      ],
+    });
+  }
+
+  async getRecentBusinesses() {
+    return this.prisma.business.findMany({
+      where: {
+        status: 'ACTIVE',
+      },
+
+      include: {
+        locations: {
+          where: {
+            is_active: true,
+          },
+          take: 1,
+        },
+      },
+
+      take: 10,
+
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
+  }
 }

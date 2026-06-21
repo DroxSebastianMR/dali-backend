@@ -18,6 +18,8 @@ import { VerifyResetTokenSchema } from '../schema/verify-reset-token.schema';
 import { VerifyResetTokenDTO } from '../dtos/verify-reset-token.dto';
 import { ResetPasswordDTO } from '../dtos/reset-password.dto';
 import { ResetPasswordSchema } from '../schema/reset-password.schema';
+import { SocialLoginDTO } from '../dtos/social-login.dto';
+import { SocialLoginSchema } from '../schema/social-login.schema';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -99,5 +101,21 @@ export class AuthController {
     @Body(new ValidationPipe(ResetPasswordSchema)) body: ResetPasswordDTO,
   ) {
     return this.resetPasswordService.resetPassword(body);
+  }
+
+  @Post('social-login')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Login Social',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Login social exitoso',
+  })
+  async socialLogin(
+    @Body(new ValidationPipe(SocialLoginSchema))
+    body: SocialLoginDTO,
+  ) {
+    return this.authService.socialLogin(body);
   }
 }
